@@ -77,33 +77,6 @@ final class UsageAggregator: ObservableObject {
         snapshot?.providers.first { $0.identifier == id }
     }
 
-    func collectSessionsForReporting(since: Date?) async throws -> [UsageReportSession] {
-        let lowerBound = since ?? Date().addingTimeInterval(-3600)
-        var sessions: [UsageReportSession] = []
-
-        for provider in providerRegistry.enabledProviders() {
-            let rawSessions = try await provider.sessions(since: lowerBound)
-            sessions.append(contentsOf: rawSessions.map { raw in
-                UsageReportSession(
-                    provider: raw.providerIdentifier,
-                    profile: raw.profile,
-                    model: raw.model,
-                    startedAt: raw.startedAt,
-                    endedAt: raw.endedAt,
-                    inputTokens: raw.inputTokens,
-                    outputTokens: raw.outputTokens,
-                    cacheReadTokens: raw.cacheReadTokens,
-                    cacheWriteTokens: raw.cacheWriteTokens,
-                    requestCount: raw.requestCount,
-                    costUSD: raw.costUSD,
-                    projectHint: raw.projectHint.map { URL(fileURLWithPath: $0).lastPathComponent }
-                )
-            })
-        }
-
-        return sessions.sorted { $0.startedAt < $1.startedAt }
-    }
-
     private func placeholderResult(for provider: any UsageProvider) -> ProviderResult {
         ProviderResult(
             identifier: provider.identifier,

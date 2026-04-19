@@ -6,7 +6,7 @@ struct AboutTab: View {
 
     var body: some View {
         SettingsPaneScroll {
-            SettingsSectionCard(title: "Cirrondly Desk", subtitle: "Native macOS usage tracking for AI tools across your desktop.", eyebrow: "About") {
+            SettingsSectionCard(title: "Cirrondly Desk Community", subtitle: "Native macOS usage tracking for AI tools across your desktop.", eyebrow: "About") {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(spacing: 14) {
                         Image("CloudLogo")
@@ -15,7 +15,7 @@ struct AboutTab: View {
                             .frame(width: 58, height: 38)
 
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("Cirrondly Desk")
+                            Text("Cirrondly Desk Community")
                                 .font(Typography.body(24, weight: .semibold))
                             Text(versionString)
                                 .font(Typography.body(12))
@@ -27,7 +27,7 @@ struct AboutTab: View {
                         SettingsBadge(title: "macOS", tint: .cirrondlyBlueDark)
                     }
 
-                    Text("Track provider limits, burn rate, and credits in the menu bar without sending your local usage anywhere unless you explicitly connect a workspace.")
+                    Text("Track provider limits, burn rate, and credits in the menu bar without sending your local usage anywhere.")
                         .font(Typography.body(12))
                         .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.72))
                         .fixedSize(horizontal: false, vertical: true)
@@ -48,11 +48,11 @@ struct AboutTab: View {
                 }
             }
 
-            SettingsSectionCard(title: "Inspired by Open Source", subtitle: "Provider support in Cirrondly Desk builds on ideas, research, and prior open source work from these projects.", eyebrow: "Credits") {
+            SettingsSectionCard(title: "Inspired by Open Source", subtitle: "Provider support in Cirrondly Desk Community builds on ideas, research, and prior open source work from these projects.", eyebrow: "Credits") {
                 VStack(alignment: .leading, spacing: 14) {
                     SettingsSectionHeader(
                         title: "Inspired by Open Source",
-                        subtitle: "Provider support in Cirrondly Desk builds on ideas, research, and prior open source work from these projects.",
+                        subtitle: "Provider support in Cirrondly Desk Community builds on ideas, research, and prior open source work from these projects.",
                         eyebrow: "Credits"
                     )
 
@@ -80,6 +80,13 @@ struct AboutTab: View {
                             openURL(URL(string: "https://github.com/cirrondly/cirrondly-desk-community/issues")!)
                         }
                     }
+
+                    Divider()
+
+                    Button("Need team analytics? See Cirrondly Desk at cirrondly.com/desk.") {
+                        openURL(URL(string: "https://cirrondly.com/desk")!)
+                    }
+                    .font(Typography.body(11, weight: .semibold))
                 }
             }
         }

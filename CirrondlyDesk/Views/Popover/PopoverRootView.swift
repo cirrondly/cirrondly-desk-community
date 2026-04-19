@@ -16,7 +16,7 @@ struct PopoverRootView: View {
             GradientBackground()
 
             VStack(spacing: 0) {
-                ScrollView {
+                ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         HeaderView(lastUpdated: container.usageAggregator.lastRefreshedAt)
 
@@ -48,6 +48,7 @@ struct PopoverRootView: View {
                     }
                     .padding(16)
                 }
+                .background(HiddenScrollerConfigurator())
 
                 Divider()
                     .overlay(Color.cirrondlyBlueLight.opacity(0.45))
@@ -55,9 +56,28 @@ struct PopoverRootView: View {
                 FooterActionsView()
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(.ultraThinMaterial)
             }
             .frame(width: 420, height: 600)
+        }
+    }
+}
+
+private struct HiddenScrollerConfigurator: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView(frame: .zero)
+        view.postsFrameChangedNotifications = true
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            guard let scrollView = nsView.enclosingScrollView else { return }
+            scrollView.hasVerticalScroller = false
+            scrollView.hasHorizontalScroller = false
+            scrollView.scrollerStyle = .overlay
+            scrollView.drawsBackground = false
+            scrollView.backgroundColor = .clear
+            scrollView.contentView.drawsBackground = false
         }
     }
 }

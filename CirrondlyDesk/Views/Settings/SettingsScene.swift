@@ -2,8 +2,9 @@ import SwiftUI
 
 enum SettingsPaneTab: String, Hashable {
     case general
-    case providers
+    case sources
     case display
+    case profiles
     case advanced
     case about
 }
@@ -20,11 +21,14 @@ struct SettingsScene: View {
                     .tabItem { Label("General", systemImage: "gearshape") }
                     .tag(SettingsPaneTab.general)
                 ProvidersTab()
-                    .tabItem { Label("Providers", systemImage: "square.grid.2x2") }
-                    .tag(SettingsPaneTab.providers)
+                    .tabItem { Label("Sources", systemImage: "square.grid.2x2") }
+                    .tag(SettingsPaneTab.sources)
                 DisplayTab()
                     .tabItem { Label("Display", systemImage: "eye") }
                     .tag(SettingsPaneTab.display)
+                ProfilesTab()
+                    .tabItem { Label("Profiles", systemImage: "person.2") }
+                    .tag(SettingsPaneTab.profiles)
                 AdvancedTab()
                     .tabItem { Label("Advanced", systemImage: "slider.horizontal.3") }
                     .tag(SettingsPaneTab.advanced)

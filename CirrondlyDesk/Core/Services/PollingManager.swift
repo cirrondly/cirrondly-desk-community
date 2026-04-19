@@ -10,22 +10,19 @@ final class PollingManager {
     private let serviceStatusMonitor: ServiceStatusMonitor
     private let exporter: StatusLineExporter
     private let notifications: NotificationService
-    private let reportingScheduler: ReportingScheduler
 
     private var loopTask: Task<Void, Never>?
     private var currentInterval: TimeInterval = 300
 
-    init(usageAggregator: UsageAggregator, serviceStatusMonitor: ServiceStatusMonitor, exporter: StatusLineExporter, notifications: NotificationService, reportingScheduler: ReportingScheduler) {
+    init(usageAggregator: UsageAggregator, serviceStatusMonitor: ServiceStatusMonitor, exporter: StatusLineExporter, notifications: NotificationService) {
         self.usageAggregator = usageAggregator
         self.serviceStatusMonitor = serviceStatusMonitor
         self.exporter = exporter
         self.notifications = notifications
-        self.reportingScheduler = reportingScheduler
         currentInterval = baseInterval
     }
 
     func start() {
-        reportingScheduler.scheduleHourly()
         guard loopTask == nil else { return }
 
         loopTask = Task { [weak self] in
@@ -40,7 +37,6 @@ final class PollingManager {
     func stop() {
         loopTask?.cancel()
         loopTask = nil
-        reportingScheduler.stop()
     }
 
     func onPopoverOpen() {
@@ -66,6 +62,5 @@ final class PollingManager {
         guard let snapshot = usageAggregator.snapshot else { return }
         exporter.export(snapshot: snapshot)
         notifications.handle(snapshot: snapshot)
-        await reportingScheduler.sendDueReportIfNeeded()
     }
 }

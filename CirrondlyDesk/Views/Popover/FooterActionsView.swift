@@ -2,7 +2,6 @@ import SwiftUI
 
 struct FooterActionsView: View {
     @EnvironmentObject private var container: DependencyContainer
-    @Environment(\.openURL) private var openURL
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {

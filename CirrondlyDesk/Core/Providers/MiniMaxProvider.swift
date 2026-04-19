@@ -212,7 +212,6 @@ final class MiniMaxProvider: UsageProvider {
         guard used >= 0 else { return nil }
 
         let now = Date()
-        let startDate = epochDate(chosen["start_time"] ?? chosen["startTime"])
         let endDate = epochDate(chosen["end_time"] ?? chosen["endTime"])
         let remainsRaw = Self.doubleValue(chosen["remains_time"] ?? chosen["remainsTime"])
         let inferredReset = inferRemainsDate(remainsRaw: remainsRaw, endDate: endDate, now: now)

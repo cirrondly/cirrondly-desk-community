@@ -2,13 +2,11 @@ import AppKit
 import SwiftUI
 
 struct AdvancedTab: View {
-    @EnvironmentObject private var container: DependencyContainer
     @AppStorage("advanced.statusline.enabled") private var statuslineEnabled = true
-    @AppStorage("advanced.analytics.optOut") private var analyticsOptOut = false
 
     var body: some View {
         SettingsPaneScroll {
-            SettingsSectionCard(title: "Integrations", subtitle: "Exports, telemetry, and workspace sync live here.", eyebrow: "Advanced") {
+            SettingsSectionCard(title: "Integrations", subtitle: "Exports and local maintenance tools live here.", eyebrow: "Advanced") {
                 VStack(alignment: .leading, spacing: 16) {
                     SettingsSectionHeader(
                         title: "Integrations",
@@ -21,16 +19,6 @@ struct AdvancedTab: View {
                         subtitle: "Continuously write the latest usage snapshot to the shell-friendly statusline payload."
                     ) {
                         Toggle("Statusline export", isOn: $statuslineEnabled)
-                            .labelsHidden()
-                    }
-
-                    Divider()
-
-                    SettingsSplitRow(
-                        title: "Opt out of version heartbeat",
-                        subtitle: "Disable the lightweight product heartbeat used to understand active versions in the field."
-                    ) {
-                        Toggle("Opt out of version heartbeat", isOn: $analyticsOptOut)
                             .labelsHidden()
                     }
                 }

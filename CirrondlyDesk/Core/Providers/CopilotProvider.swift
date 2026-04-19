@@ -245,16 +245,7 @@ final class CopilotProvider: UsageProvider {
         var todayCount = 0
 
         for root in workspaceStorageRoots {
-            guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else {
-                continue
-            }
-
-            for case let url as URL in enumerator {
-                guard url.pathExtension == "jsonl",
-                      url.path.contains("/GitHub.copilot-chat/transcripts/") else {
-                    continue
-                }
-
+            for url in transcriptURLs(in: root) {
                 let rows = try await JSONLStreamReader.readObjects(at: url)
                 for row in rows {
                     guard let eventType = stringValue(row["type"]),
@@ -279,6 +270,23 @@ final class CopilotProvider: UsageProvider {
             heatmap: calculator.heatmap(fromDailyValues: points, days: days),
             todayCount: todayCount
         )
+    }
+
+    private func transcriptURLs(in root: URL) -> [URL] {
+        guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else {
+            return []
+        }
+
+        var urls: [URL] = []
+        while let nextObject = enumerator.nextObject() {
+            guard let url = nextObject as? URL,
+                  url.pathExtension == "jsonl",
+                  url.path.contains("/GitHub.copilot-chat/transcripts/") else {
+                continue
+            }
+            urls.append(url)
+        }
+        return urls
     }
 
     private var workspaceStorageRoots: [URL] {

@@ -12,29 +12,21 @@ final class DependencyContainer: ObservableObject {
     let pollingManager: PollingManager
     let notificationService: NotificationService
     let statusLineExporter: StatusLineExporter
-    let apiClient: CirrondlyAPIClient
-    let teamEnrollmentService: TeamEnrollmentService
     let launchAtLoginService: LaunchAtLoginService
     let updateChecker: UpdateChecker
-    let analyticsHeartbeat: AnalyticsHeartbeat
-    let reportingScheduler: ReportingScheduler
 
     private var cancellables = Set<AnyCancellable>()
 
     private init() {
         keychainService = KeychainService()
-        apiClient = CirrondlyAPIClient(keychainService: keychainService)
         providerRegistry = ProviderRegistry(keychainService: keychainService)
         usageAggregator = UsageAggregator(providerRegistry: providerRegistry)
         serviceStatusMonitor = ServiceStatusMonitor()
         notificationService = NotificationService()
         statusLineExporter = StatusLineExporter()
-        teamEnrollmentService = TeamEnrollmentService(apiClient: apiClient, keychainService: keychainService)
         launchAtLoginService = LaunchAtLoginService()
         updateChecker = UpdateChecker()
-        analyticsHeartbeat = AnalyticsHeartbeat()
-        reportingScheduler = ReportingScheduler(apiClient: apiClient, aggregator: usageAggregator, enrollment: teamEnrollmentService, keychainService: keychainService)
-        pollingManager = PollingManager(usageAggregator: usageAggregator, serviceStatusMonitor: serviceStatusMonitor, exporter: statusLineExporter, notifications: notificationService, reportingScheduler: reportingScheduler)
+        pollingManager = PollingManager(usageAggregator: usageAggregator, serviceStatusMonitor: serviceStatusMonitor, exporter: statusLineExporter, notifications: notificationService)
 
         bindObjectChanges()
     }

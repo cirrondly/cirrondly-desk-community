@@ -1,22 +1,107 @@
-# Cirrondly Desk
+# Cirrondly Desk Community
 
-Cirrondly Desk is a native macOS menu bar app that tracks AI coding tool usage across local providers and can optionally report encrypted metrics to a paid Cirrondly workspace.
+A native macOS menu bar app that tracks your AI coding tool usage across multiple
+providers — locally, privately, for free.
 
-## Current scaffold
+<p align="center">
+	<img src="demo/Desk.png" alt="Cirrondly Desk Community" width="600">
+</p>
 
-- Native menu bar shell built with AppKit and SwiftUI
-- Branded popover and settings window using Cirrondly colors
-- Local provider modules for Claude Code, Codex, Continue, Aider, Cursor, and Claude subscription
-- Optional team enrollment and hourly usage reporting boundary
-- Local statusline export to `~/.cirrondly/usage.json`
-- GitHub Actions release workflow scaffold for notarized DMG releases
+## Features
 
-## Notes
+- **10+ providers supported**: track Claude Code, Cursor, Codex, Copilot,
+	Kiro, Windsurf, JetBrains AI, Gemini CLI, Continue, Aider, Amp, Kimi,
+	MiniMax, Perplexity, Antigravity, OpenCode Go, Synthetic, Z.AI, and more.
+- **Service status at a glance**: see provider service health directly in the
+	popover and Sources settings.
+- **Usage timeline and history**: follow session, weekly, and monthly activity
+	with progress bars plus a 90-day usage heatmap.
+- **Remaining tokens and time to reset**: monitor usage, remaining
+	tokens/requests/credits, and the countdown to the next reset window.
+- **Quota alert notifications**: receive local macOS alerts when a provider
+	crosses your configured quota thresholds.
+- **Subscription and account type labels**: each provider is tagged as
+	Subscription, API, Usage Based, or Free.
+- **Unified menu bar summary**: keep today's cost, burn rate, and active usage
+	visible without opening a dashboard.
+- **Statusline export**: writes `~/.cirrondly/usage.json` for Claude Code
+	statusLine, shell prompts, tmux, and other local workflows.
+- **100% local data**: no account, no telemetry, no cloud. All usage data stays
+	on your Mac.
 
-- The bundled font files and final cloud artwork are not checked in yet. The app falls back to system fonts until those assets are added.
-- Several providers are detected but still use placeholder probe results where local schemas are unstable or not yet finalized.
-- The paid/free boundary is preserved: no requests are made to `api.cirrondly.com` unless the user explicitly enrolls.
+## Installation
 
-## Build
+Download the latest `.dmg` from [Releases](https://github.com/cirrondly/cirrondly-desk-community/releases).
 
-Open `CirrondlyDesk.xcodeproj` in Xcode 16+ and build the `CirrondlyDesk` target on macOS 15 or later.
+1. Open the downloaded `.dmg`.
+2. Drag `Cirrondly Desk Community.app` into `Applications`.
+3. Launch the app from `Applications`.
+
+## Requirements
+
+- macOS 14 (Sonoma) or later
+- No Claude, Cursor, or Copilot account required — the app reads from local
+	files you already have if those tools are installed.
+
+## Screenshots
+
+<p align="center">
+	<img src="demo/iconbar.png" alt="Menu bar icon" width="220">
+	<img src="demo/app%20copilot.png" alt="Provider usage popover" width="320">
+</p>
+
+<p align="center">
+	<img src="demo/app%20kiro.png" alt="Kiro provider details" width="320">
+	<img src="demo/settings%20sources.png" alt="Sources settings" width="320">
+</p>
+
+<p align="center">
+	<img src="demo/setting%20general.png" alt="General settings and quota alerts" width="420">
+</p>
+
+## Building from source
+
+```bash
+git clone https://github.com/cirrondly/cirrondly-desk-community.git
+cd cirrondly-desk-community
+open CirrondlyDesk.xcodeproj
+```
+
+Requires Xcode 16 or later.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Acknowledgments
+
+This project draws inspiration from excellent open-source work:
+
+- **[openusage](https://github.com/robinebers/openusage)** — plugin architecture
+	for multi-provider usage tracking.
+- **[Claude-Code-Usage-Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor)** — burn rate and prediction logic.
+- **[ClaudeMeter](https://github.com/eddmann/ClaudeMeter)** — color-coded
+	menu bar indicator and settings structure.
+- **[Claude-Usage-Tracker](https://github.com/hamed-elfayome/Claude-Usage-Tracker)** — multi-profile approach and native macOS patterns.
+- **[ccusage](https://github.com/ryoppippi/ccusage)** — Claude Code JSONL
+	parsing reference.
+
+These projects are independent and under their own licenses. We re-implemented
+similar functionality in Swift from scratch; no code was copied.
+
+## Disclaimer
+
+This is an unofficial tool and is not affiliated with, endorsed by, or supported
+by Anthropic, OpenAI, GitHub, Amazon, Google, JetBrains, Cursor, or any other
+AI coding tool vendor.
+
+Data is read from local files on your own Mac. No accounts are accessed.
+No API calls are made to AI vendor APIs unless you explicitly configure them
+in Sources settings.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE).
+
+"Cirrondly" and the Cirrondly cloud logo are trademarks of Cirrondly SAS —
+see [TRADEMARKS.md](TRADEMARKS.md).
