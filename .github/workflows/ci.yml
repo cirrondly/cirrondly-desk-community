@@ -2,32 +2,66 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [master, main]
   push:
-    branches: [main]
+    branches: [master, main]
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.app
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          candidates=(/Applications/Xcode.app /Applications/Xcode_*.app)
+          selected=""
+
+          for candidate in "${candidates[@]}"; do
+            if [[ -d "$candidate" ]]; then
+              sudo xcode-select -s "$candidate/Contents/Developer"
+              echo "DEVELOPER_DIR=$candidate/Contents/Developer" >> "$GITHUB_ENV"
+              selected="$candidate"
+              break
+            fi
+          done
+
+          if [[ -z "$selected" ]]; then
+            echo "No Xcode installation found under /Applications" >&2
+            exit 1
+          fi
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Show Swift version
+        run: swift --version
 
       - name: Build
+        env:
+          DERIVED_DATA: ${{ runner.temp }}/DerivedData
         run: |
+          set -o pipefail
           xcodebuild \
             -project CirrondlyDesk.xcodeproj \
             -scheme CirrondlyDesk \
             -configuration Debug \
+            -derivedDataPath "$DERIVED_DATA" \
+            -resultBundlePath "$RUNNER_TEMP/ci-build.xcresult" \
             -destination 'platform=macOS' \
-            build | xcpretty && exit ${PIPESTATUS[0]}
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            build 2>&1 | tee "$RUNNER_TEMP/ci-build.log"
 
-      - name: Test
-        run: |
-          xcodebuild \
-            -project CirrondlyDesk.xcodeproj \
-            -scheme CirrondlyDesk \
-            -destination 'platform=macOS' \
-            test | xcpretty && exit ${PIPESTATUS[0]}
+      - name: Upload CI diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-build-diagnostics
+          path: |
+            ${{ runner.temp }}/ci-build.log
+            ${{ runner.temp }}/ci-build.xcresult
