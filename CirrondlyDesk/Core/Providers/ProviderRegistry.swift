@@ -7,12 +7,24 @@ final class ProviderRegistry: ObservableObject {
     init(keychainService: KeychainService) {
         providers = [
             ClaudeCodeProvider(keychainService: keychainService),
+            CursorProvider(keychainService: keychainService),
             CodexProvider(keychainService: keychainService),
-            KiroProvider(),
             CopilotProvider(keychainService: keychainService),
+            AntigravityProvider(),
+            AmpProvider(),
+            FactoryProvider(keychainService: keychainService),
+            KiroProvider(),
+            KimiProvider(),
             WindsurfProvider(),
+            GeminiProvider(),
+            MiniMaxProvider(),
+            PerplexityProvider(),
             OpenCodeGoProvider(),
-            AntigravityProvider()
+            SyntheticProvider(),
+            ZAIProvider(),
+            JetBrainsAIProvider(),
+            ContinueProvider(),
+            AiderProvider()
         ]
     }
 
