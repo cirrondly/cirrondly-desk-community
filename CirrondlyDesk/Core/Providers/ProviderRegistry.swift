@@ -7,6 +7,8 @@ final class ProviderRegistry: ObservableObject {
     init(keychainService: KeychainService) {
         providers = [
             ClaudeCodeProvider(keychainService: keychainService),
+            CodexProvider(keychainService: keychainService),
+            KiroProvider(),
             CopilotProvider(keychainService: keychainService)
         ]
     }

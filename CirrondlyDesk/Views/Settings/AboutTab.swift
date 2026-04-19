@@ -48,7 +48,7 @@ struct AboutTab: View {
                 }
             }
 
-            SettingsSectionCard(title: "Attributions", subtitle: "Provider support in Cirrondly Desk builds on ideas and research from these projects.", eyebrow: "Credits") {
+            SettingsSectionCard(title: "Inspired by Open Source", subtitle: "Provider support in Cirrondly Desk builds on ideas, research, and prior open source work from these projects.", eyebrow: "Credits") {
                 VStack(alignment: .leading, spacing: 10) {
                     attributionLink(title: "robinebers/openusage", url: "https://github.com/robinebers/openusage")
                     attributionLink(title: "Maciek-roboblog/Claude-Code-Usage-Monitor", url: "https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor")
