@@ -9,7 +9,10 @@ final class ProviderRegistry: ObservableObject {
             ClaudeCodeProvider(keychainService: keychainService),
             CodexProvider(keychainService: keychainService),
             KiroProvider(),
-            CopilotProvider(keychainService: keychainService)
+            CopilotProvider(keychainService: keychainService),
+            WindsurfProvider(),
+            OpenCodeGoProvider(),
+            AntigravityProvider()
         ]
     }
 

@@ -49,7 +49,13 @@ struct AboutTab: View {
             }
 
             SettingsSectionCard(title: "Inspired by Open Source", subtitle: "Provider support in Cirrondly Desk builds on ideas, research, and prior open source work from these projects.", eyebrow: "Credits") {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 14) {
+                    SettingsSectionHeader(
+                        title: "Inspired by Open Source",
+                        subtitle: "Provider support in Cirrondly Desk builds on ideas, research, and prior open source work from these projects.",
+                        eyebrow: "Credits"
+                    )
+
                     attributionLink(title: "robinebers/openusage", url: "https://github.com/robinebers/openusage")
                     attributionLink(title: "Maciek-roboblog/Claude-Code-Usage-Monitor", url: "https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor")
                     attributionLink(title: "eddmann/ClaudeMeter", url: "https://github.com/eddmann/ClaudeMeter")
@@ -57,15 +63,22 @@ struct AboutTab: View {
                 }
             }
 
-            SettingsSectionCard(title: "Privacy", subtitle: "Cirrondly stays useful even when you keep everything local.", eyebrow: "Trust") {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Read the privacy policy for details on team reporting, update checks, and what stays only on your machine.")
-                        .font(Typography.body(12))
-                        .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.72))
-                        .fixedSize(horizontal: false, vertical: true)
+            SettingsSectionCard(title: "Community", subtitle: "Cirrondly Desk Community is open source and maintained in public.", eyebrow: "Open Source") {
+                VStack(alignment: .leading, spacing: 14) {
+                    SettingsSectionHeader(
+                        title: "Contribute or report issues",
+                        subtitle: "Open an issue, review the code, or send a pull request in the public repository.",
+                        eyebrow: "Open Source"
+                    )
 
-                    Button("Open privacy policy") {
-                        openURL(URL(string: "https://cirrondly.com/privacy")!)
+                    HStack(spacing: 10) {
+                        Button("Open repository") {
+                            openURL(URL(string: "https://github.com/cirrondly/cirrondly-desk-community")!)
+                        }
+
+                        Button("Report issue") {
+                            openURL(URL(string: "https://github.com/cirrondly/cirrondly-desk-community/issues")!)
+                        }
                     }
                 }
             }
