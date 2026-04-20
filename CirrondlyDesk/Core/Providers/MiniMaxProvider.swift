@@ -190,22 +190,23 @@ final class MiniMaxProvider: UsageProvider {
         }
 
         let usageFieldCount = Self.doubleValue(chosen["current_interval_usage_count"] ?? chosen["currentIntervalUsageCount"])
-        let remainingCount = Self.doubleValue(
-            chosen["current_interval_remaining_count"]
-            ?? chosen["currentIntervalRemainingCount"]
-            ?? chosen["current_interval_remains_count"]
-            ?? chosen["currentIntervalRemainsCount"]
-            ?? chosen["current_interval_remain_count"]
-            ?? chosen["currentIntervalRemainCount"]
-            ?? chosen["remaining_count"]
-            ?? chosen["remainingCount"]
-            ?? chosen["remains_count"]
-            ?? chosen["remainsCount"]
-            ?? chosen["remaining"]
-            ?? chosen["remains"]
-            ?? chosen["left_count"]
-            ?? chosen["leftCount"]
-        )
+        let remainingCountCandidates: [Any?] = [
+            chosen["current_interval_remaining_count"],
+            chosen["currentIntervalRemainingCount"],
+            chosen["current_interval_remains_count"],
+            chosen["currentIntervalRemainsCount"],
+            chosen["current_interval_remain_count"],
+            chosen["currentIntervalRemainCount"],
+            chosen["remaining_count"],
+            chosen["remainingCount"],
+            chosen["remains_count"],
+            chosen["remainsCount"],
+            chosen["remaining"],
+            chosen["remains"],
+            chosen["left_count"],
+            chosen["leftCount"]
+        ]
+        let remainingCount = Self.firstDoubleValue(remainingCountCandidates)
         let explicitUsed = Self.doubleValue(chosen["current_interval_used_count"] ?? chosen["currentIntervalUsedCount"] ?? chosen["used_count"] ?? chosen["used"])
         let inferredRemaining = remainingCount ?? usageFieldCount
         let used = max(0, min(total, explicitUsed ?? (inferredRemaining.map { total - $0 } ?? -1)))
@@ -309,6 +310,13 @@ final class MiniMaxProvider: UsageProvider {
         if let value = value as? Int { return Double(value) }
         if let value = value as? NSNumber { return value.doubleValue }
         if let value = value as? String { return Double(value.trimmingCharacters(in: .whitespacesAndNewlines)) }
+        return nil
+    }
+
+    private static func firstDoubleValue(_ values: [Any?]) -> Double? {
+        for value in values {
+            if let parsed = doubleValue(value) { return parsed }
+        }
         return nil
     }
 

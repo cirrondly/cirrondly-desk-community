@@ -308,7 +308,19 @@ final class PerplexityProvider: UsageProvider {
         if let cents = Self.doubleValue(object["cents"] ?? object["amount_cents"] ?? object["amountCents"] ?? object["value_cents"] ?? object["valueCents"]) {
             return cents / 100
         }
-        return Self.doubleValue(object["usd"] ?? object["amount_usd"] ?? object["amountUsd"] ?? object["value_usd"] ?? object["valueUsd"] ?? object["amount"] ?? object["value"] ?? object["balance"] ?? object["remaining"] ?? object["available"])
+        let directAmountCandidates: [Any?] = [
+            object["usd"],
+            object["amount_usd"],
+            object["amountUsd"],
+            object["value_usd"],
+            object["valueUsd"],
+            object["amount"],
+            object["value"],
+            object["balance"],
+            object["remaining"],
+            object["available"]
+        ]
+        return Self.firstDoubleValue(directAmountCandidates)
     }
 
     private func sumUsageCostUSD(_ payload: Any?) -> Double? {
@@ -354,6 +366,13 @@ final class PerplexityProvider: UsageProvider {
         if let value = value as? String {
             let cleaned = value.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "$", with: "").replacingOccurrences(of: ",", with: "")
             return Double(cleaned)
+        }
+        return nil
+    }
+
+    private static func firstDoubleValue(_ values: [Any?]) -> Double? {
+        for value in values {
+            if let parsed = doubleValue(value) { return parsed }
         }
         return nil
     }
