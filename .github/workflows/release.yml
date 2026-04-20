@@ -54,7 +54,8 @@ jobs:
       - name: Show Swift version
         run: swift --version
 
-      - name: Validate release signing secrets
+      - name: Detect signing availability
+        id: signing
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -73,12 +74,14 @@ jobs:
           done
 
           if (( ${#missing[@]} > 0 )); then
-            printf 'Missing required release secrets: %s\n' "${missing[*]}" >&2
-            echo "Unsigned DMGs are blocked by Gatekeeper and appear as damaged after download." >&2
-            exit 1
+            printf 'Signing secrets missing, building unsigned release: %s\n' "${missing[*]}"
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Import Apple Developer certificate
+        if: steps.signing.outputs.enabled == 'true'
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -117,6 +120,7 @@ jobs:
             build 2>&1 | tee "$RUNNER_TEMP/release-build.log"
 
       - name: Sign app bundle
+        if: steps.signing.outputs.enabled == 'true'
         env:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
@@ -140,6 +144,7 @@ jobs:
           codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 
       - name: Notarize and staple app bundle
+        if: steps.signing.outputs.enabled == 'true'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
@@ -194,7 +199,7 @@ jobs:
           echo "dmg_path=$DMG_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Sign, notarize, and staple DMG
-        id: notarize_dmg
+        if: steps.signing.outputs.enabled == 'true'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
@@ -222,6 +227,13 @@ jobs:
           xcrun stapler staple "$DMG_PATH"
           xcrun stapler validate "$DMG_PATH"
 
+      - name: Generate checksum
+        id: checksum
+        run: |
+          set -euo pipefail
+
+          DMG_PATH="${{ steps.package.outputs.dmg_path }}"
+
           shasum -a 256 "$DMG_PATH" > "$DMG_PATH.sha256"
           echo "sha_path=$DMG_PATH.sha256" >> "$GITHUB_OUTPUT"
 
@@ -232,7 +244,7 @@ jobs:
           generate_release_notes: true
           files: |
             ${{ steps.package.outputs.dmg_path }}
-            ${{ steps.notarize_dmg.outputs.sha_path }}
+            ${{ steps.checksum.outputs.sha_path }}
 
       - name: Upload release diagnostics
         if: failure()

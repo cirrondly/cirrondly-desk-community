@@ -31,26 +31,27 @@ providers locally, privately, for free.
 
 ## Installation
 
-1. Download the latest .dmg from [Releases](https://github.com/cirrondly/desk/releases)
-2. Open the .dmg and drag "Cirrondly Desk Community" to Applications
-3. **First launch only** Gatekeeper will block the app. Right-click on the
-   app in Applications, choose "Open", then "Open" again in the dialog.
+1. Download the latest `.dmg` from [Releases](https://github.com/cirrondly/cirrondly-desk-community/releases)
+2. Open the `.dmg` and drag `Cirrondly Desk Community.app` to `Applications`.
+3. **First launch only**: Gatekeeper may block the app. Right-click the app in
+	`Applications`, choose `Open`, then choose `Open` again in the dialog.
 
-If that doesn't work, open Terminal and run:
+	If that does not work, open Terminal and run:
 
 ```bash
-   xattr -cr /Applications/Cirrondly\ Desk\ Community.app
+xattr -cr /Applications/Cirrondly\ Desk\ Community.app
 ```
 
 4. Open the app. That's it.
 
-We're working on Apple signing for the next release. Until then, the app is
-ad-hoc signed safe, but Gatekeeper shows a warning on first launch.
+We're working on Apple signing for a future release. Until then, GitHub
+Releases are unsigned and not notarized, so Gatekeeper may show a warning on
+first launch.
 
 ## Requirements
 
 - macOS 14 (Sonoma) or later
-- No Claude, Cursor, or Copilot account required the app reads from local
+- No Claude, Cursor, or Copilot account required. The app reads from local
 	files you already have if those tools are installed.
 
 ## Screenshots
@@ -111,7 +112,7 @@ in Sources settings.
 
 ## License
 
-Apache License 2.0 see [LICENSE](LICENSE).
+Apache License 2.0. See [LICENSE](LICENSE).
 
 "Cirrondly" and the Cirrondly cloud logo are trademarks of Cirrondly SAS
 see [TRADEMARKS.md](TRADEMARKS.md).
