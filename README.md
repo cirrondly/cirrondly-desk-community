@@ -1,7 +1,7 @@
 # Cirrondly Desk Community
 
 A native macOS menu bar app that tracks your AI coding tool usage across multiple
-providers — locally, privately, for free.
+providers locally, privately, for free.
 
 <p align="center">
 	<img src="demo/Desk.png" alt="Cirrondly Desk Community" width="600">
@@ -31,16 +31,26 @@ providers — locally, privately, for free.
 
 ## Installation
 
-Download the latest `.dmg` from [Releases](https://github.com/cirrondly/cirrondly-desk-community/releases).
+1. Download the latest .dmg from [Releases](https://github.com/cirrondly/desk/releases)
+2. Open the .dmg and drag "Cirrondly Desk Community" to Applications
+3. **First launch only** Gatekeeper will block the app. Right-click on the
+   app in Applications, choose "Open", then "Open" again in the dialog.
 
-1. Open the downloaded `.dmg`.
-2. Drag `Cirrondly Desk Community.app` into `Applications`.
-3. Launch the app from `Applications`.
+If that doesn't work, open Terminal and run:
+
+```bash
+   xattr -cr /Applications/Cirrondly\ Desk\ Community.app
+```
+
+4. Open the app. That's it.
+
+We're working on Apple signing for the next release. Until then, the app is
+ad-hoc signed safe, but Gatekeeper shows a warning on first launch.
 
 ## Requirements
 
 - macOS 14 (Sonoma) or later
-- No Claude, Cursor, or Copilot account required — the app reads from local
+- No Claude, Cursor, or Copilot account required the app reads from local
 	files you already have if those tools are installed.
 
 ## Screenshots
@@ -77,13 +87,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 This project draws inspiration from excellent open-source work:
 
-- **[openusage](https://github.com/robinebers/openusage)** — plugin architecture
+- **[openusage](https://github.com/robinebers/openusage)** plugin architecture
 	for multi-provider usage tracking.
-- **[Claude-Code-Usage-Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor)** — burn rate and prediction logic.
-- **[ClaudeMeter](https://github.com/eddmann/ClaudeMeter)** — color-coded
+- **[Claude-Code-Usage-Monitor](https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor)** burn rate and prediction logic.
+- **[ClaudeMeter](https://github.com/eddmann/ClaudeMeter)** color-coded
 	menu bar indicator and settings structure.
-- **[Claude-Usage-Tracker](https://github.com/hamed-elfayome/Claude-Usage-Tracker)** — multi-profile approach and native macOS patterns.
-- **[ccusage](https://github.com/ryoppippi/ccusage)** — Claude Code JSONL
+- **[Claude-Usage-Tracker](https://github.com/hamed-elfayome/Claude-Usage-Tracker)** multi-profile approach and native macOS patterns.
+- **[ccusage](https://github.com/ryoppippi/ccusage)** Claude Code JSONL
 	parsing reference.
 
 These projects are independent and under their own licenses. We re-implemented
@@ -101,7 +111,7 @@ in Sources settings.
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE).
+Apache License 2.0 see [LICENSE](LICENSE).
 
-"Cirrondly" and the Cirrondly cloud logo are trademarks of Cirrondly SAS —
+"Cirrondly" and the Cirrondly cloud logo are trademarks of Cirrondly SAS
 see [TRADEMARKS.md](TRADEMARKS.md).

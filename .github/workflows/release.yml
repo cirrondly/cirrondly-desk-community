@@ -17,6 +17,9 @@ permissions:
 jobs:
   release:
     runs-on: macos-latest
+    env:
+      APP_NAME: Cirrondly Desk Community
+      TAG_NAME: ${{ inputs.release_tag || github.ref_name }}
 
     steps:
       - uses: actions/checkout@v4
@@ -51,11 +54,56 @@ jobs:
       - name: Show Swift version
         run: swift --version
 
-      - name: Build release app
+      - name: Validate release signing secrets
         env:
-          DERIVED_DATA: ${{ runner.temp }}/DerivedData
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for variable in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_TEAM_ID KEYCHAIN_PASSWORD; do
+            if [[ -z "${!variable:-}" ]]; then
+              missing+=("$variable")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            printf 'Missing required release secrets: %s\n' "${missing[*]}" >&2
+            echo "Unsigned DMGs are blocked by Gatekeeper and appear as damaged after download." >&2
+            exit 1
+          fi
+
+      - name: Import Apple Developer certificate
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
+          CERT_PATH="$RUNNER_TEMP/developer-id.p12"
+
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$CERT_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" login.keychain-db
+          security default-keychain -s "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+
+      - name: Build release app
         run: |
           set -o pipefail
+          DERIVED_DATA="$RUNNER_TEMP/DerivedData"
           xcodebuild \
             -project CirrondlyDesk.xcodeproj \
             -scheme CirrondlyDesk \
@@ -68,15 +116,57 @@ jobs:
             CODE_SIGN_IDENTITY='' \
             build 2>&1 | tee "$RUNNER_TEMP/release-build.log"
 
-      - name: Package DMG
-        id: package
+      - name: Sign app bundle
         env:
-          DERIVED_DATA: ${{ runner.temp }}/DerivedData
-          APP_NAME: Cirrondly Desk Community
-          TAG_NAME: ${{ inputs.release_tag || github.ref_name }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
           set -euo pipefail
 
+          DERIVED_DATA="$RUNNER_TEMP/DerivedData"
+          APP_PATH="$DERIVED_DATA/Build/Products/Release/$APP_NAME.app"
+          if [[ ! -d "$APP_PATH" ]]; then
+            echo "Expected app bundle not found at $APP_PATH" >&2
+            exit 1
+          fi
+
+          codesign \
+            --force \
+            --deep \
+            --options runtime \
+            --timestamp \
+            --sign "$APPLE_SIGNING_IDENTITY" \
+            "$APP_PATH"
+
+          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+
+      - name: Notarize and staple app bundle
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+
+          DERIVED_DATA="$RUNNER_TEMP/DerivedData"
+          APP_PATH="$DERIVED_DATA/Build/Products/Release/$APP_NAME.app"
+          ZIP_PATH="$RUNNER_TEMP/$APP_NAME.zip"
+
+          ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
+          xcrun notarytool submit "$ZIP_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+          xcrun stapler staple "$APP_PATH"
+          xcrun stapler validate "$APP_PATH"
+
+      - name: Package DMG
+        id: package
+        run: |
+          set -euo pipefail
+
+          DERIVED_DATA="$RUNNER_TEMP/DerivedData"
           APP_PATH="$DERIVED_DATA/Build/Products/Release/$APP_NAME.app"
           if [[ ! -d "$APP_PATH" ]]; then
             echo "Expected app bundle not found at $APP_PATH" >&2
@@ -101,9 +191,38 @@ jobs:
             -format UDZO \
             "$DMG_PATH"
 
-          shasum -a 256 "$DMG_PATH" > "$DMG_PATH.sha256"
-
           echo "dmg_path=$DMG_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Sign, notarize, and staple DMG
+        id: notarize_dmg
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+
+          DMG_PATH="${{ steps.package.outputs.dmg_path }}"
+
+          codesign \
+            --force \
+            --timestamp \
+            --sign "$APPLE_SIGNING_IDENTITY" \
+            "$DMG_PATH"
+
+          codesign --verify --verbose=2 "$DMG_PATH"
+
+          xcrun notarytool submit "$DMG_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+          xcrun stapler staple "$DMG_PATH"
+          xcrun stapler validate "$DMG_PATH"
+
+          shasum -a 256 "$DMG_PATH" > "$DMG_PATH.sha256"
           echo "sha_path=$DMG_PATH.sha256" >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub release
@@ -113,7 +232,7 @@ jobs:
           generate_release_notes: true
           files: |
             ${{ steps.package.outputs.dmg_path }}
-            ${{ steps.package.outputs.sha_path }}
+            ${{ steps.notarize_dmg.outputs.sha_path }}
 
       - name: Upload release diagnostics
         if: failure()
