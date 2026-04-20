@@ -491,7 +491,8 @@ final class ClaudeSubscriptionProvider: UsageProvider {
     private func makePercentWindow(kind: WindowKind, payload: [String: Any]?) -> Window? {
         guard let payload else { return nil }
         let utilization = intValue(payload["utilization"])
-        return Window(kind: kind, used: Double(utilization), limit: 100, unit: .requests, percentage: Double(utilization), resetAt: TimeHelpers.parseISODate(stringValue(payload["resets_at"])))
+        let resetAt = TimeHelpers.parseISODate(stringValue(payload["resets_at"]))
+        return Window(kind: kind, used: Double(utilization), limit: 100, unit: .requests, percentage: Double(utilization), resetAt: resetAt, windowStart: quotaWindowStart(for: kind, resetAt: resetAt))
     }
 
     private func makeCreditsWindow(payload: [String: Any]?) -> Window? {
@@ -499,7 +500,8 @@ final class ClaudeSubscriptionProvider: UsageProvider {
         let used = Double(intValue(payload["used_credits"]))
         let limit = Double(intValue(payload["monthly_limit"]))
         guard limit > 0 else { return nil }
-        return Window(kind: .monthly, used: used, limit: limit, unit: .dollars, percentage: min(100, (used / limit) * 100), resetAt: nil)
+        let resetAt = TimeHelpers.nextMonthBoundary()
+        return Window(kind: .monthly, used: used, limit: limit, unit: .dollars, percentage: min(100, (used / limit) * 100), resetAt: resetAt)
     }
 
     private func makeRoutineWindow(payload: [String: Any]?) -> Window? {
@@ -507,7 +509,18 @@ final class ClaudeSubscriptionProvider: UsageProvider {
         let used = Double(intValue(payload["used"]))
         let limit = Double(intValue(payload["limit"]))
         guard limit > 0 else { return nil }
-        return Window(kind: .custom("Routines"), used: used, limit: limit, unit: .requests, percentage: min(100, (used / limit) * 100), resetAt: nil)
+        let resetAt = TimeHelpers.nextMonthBoundary()
+        let windowStart = resetAt.flatMap { ForecastCalculator.inferredWindowStart(kind: .monthly, resetAt: $0) }
+        return Window(kind: .custom("Routines"), used: used, limit: limit, unit: .requests, percentage: min(100, (used / limit) * 100), resetAt: resetAt, windowStart: windowStart)
+    }
+
+    private func quotaWindowStart(for kind: WindowKind, resetAt: Date?) -> Date? {
+        switch kind {
+        case .fiveHour, .weekly, .monthly:
+            return ForecastCalculator.inferredWindowStart(kind: kind, resetAt: resetAt)
+        case .custom:
+            return resetAt?.addingTimeInterval(-SessionWindowPreset.lastSevenDays.duration)
+        }
     }
 }
 

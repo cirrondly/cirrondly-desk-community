@@ -133,7 +133,7 @@ final class WindsurfProvider: UsageProvider {
             category: Self.category,
             profile: planName,
             windows: [
-                Window(kind: .custom("Daily quota"), used: 100 - dailyRemaining, limit: 100, unit: .requests, percentage: min(100, max(0, 100 - dailyRemaining)), resetAt: dailyReset),
+                Window(kind: .custom("Daily quota"), used: 100 - dailyRemaining, limit: 100, unit: .requests, percentage: min(100, max(0, 100 - dailyRemaining)), resetAt: dailyReset, windowStart: dailyReset.addingTimeInterval(-24 * 60 * 60)),
                 Window(kind: .weekly, used: 100 - weeklyRemaining, limit: 100, unit: .requests, percentage: min(100, max(0, 100 - weeklyRemaining)), resetAt: weeklyReset)
             ],
             today: .zero,

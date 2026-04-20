@@ -59,7 +59,8 @@ final class SyntheticProvider: UsageProvider {
            let remaining = Self.doubleValue(rolling["remaining"]),
            limit > 0 {
             let used = Swift.max(0, limit - remaining)
-            windows.append(makeWindow(kind: .fiveHour, used: used, limit: limit, resetAt: nil, unit: .requests))
+            let resetAt = Self.dateValue(rolling["renewsAt"]) ?? Self.dateValue(rolling["resetAt"]) ?? Date().addingTimeInterval(SessionWindowPreset.lastFiveHours.duration)
+            windows.append(makeWindow(kind: .fiveHour, used: used, limit: limit, resetAt: resetAt, unit: .requests))
             if rolling["limited"] as? Bool == true {
                 warnings.append(ProviderWarning(level: .critical, message: "Synthetic is currently rate limited."))
             }
@@ -68,7 +69,8 @@ final class SyntheticProvider: UsageProvider {
         if let weekly = payload["weeklyTokenLimit"] as? [String: Any],
            let percentRemaining = Self.doubleValue(weekly["percentRemaining"]) {
             let used = max(0, round(100 - percentRemaining))
-            windows.append(Window(kind: .weekly, used: used, limit: 100, unit: .requests, percentage: used, resetAt: nil))
+            let resetAt = Self.dateValue(weekly["renewsAt"]) ?? Self.dateValue(weekly["resetAt"]) ?? Self.nextWeekBoundary()
+            windows.append(Window(kind: .weekly, used: used, limit: 100, unit: .requests, percentage: used, resetAt: resetAt))
         }
 
         if !onV3,
@@ -76,7 +78,8 @@ final class SyntheticProvider: UsageProvider {
            let limit = Self.doubleValue(subscription["limit"]),
            limit > 0 {
             let used = Self.doubleValue(subscription["requests"]) ?? 0
-            windows.append(makeWindow(kind: .custom("Subscription"), used: used, limit: limit, resetAt: Self.dateValue(subscription["renewsAt"]), unit: .requests))
+            let resetAt = Self.dateValue(subscription["renewsAt"])
+            windows.append(makeWindow(kind: .custom("Subscription"), used: used, limit: limit, resetAt: resetAt, unit: .requests, windowStart: Self.previousMonthBoundary(for: resetAt)))
         }
 
         if !onV3,
@@ -84,7 +87,8 @@ final class SyntheticProvider: UsageProvider {
            let limit = Self.doubleValue(freeToolCalls["limit"]),
            limit > 0 {
             let used = Self.doubleValue(freeToolCalls["requests"]) ?? 0
-            windows.append(makeWindow(kind: .custom("Free Tool Calls"), used: used, limit: limit, resetAt: Self.dateValue(freeToolCalls["renewsAt"]), unit: .requests))
+            let resetAt = Self.dateValue(freeToolCalls["renewsAt"])
+            windows.append(makeWindow(kind: .custom("Free Tool Calls"), used: used, limit: limit, resetAt: resetAt, unit: .requests, windowStart: Self.previousMonthBoundary(for: resetAt)))
         }
 
         if let search = payload["search"] as? [String: Any],
@@ -92,7 +96,8 @@ final class SyntheticProvider: UsageProvider {
            let limit = Self.doubleValue(hourly["limit"]),
            limit > 0 {
             let used = Self.doubleValue(hourly["requests"]) ?? 0
-            windows.append(makeWindow(kind: .custom("Search"), used: used, limit: limit, resetAt: Self.dateValue(hourly["renewsAt"]), unit: .requests))
+            let resetAt = Self.dateValue(hourly["renewsAt"])
+            windows.append(makeWindow(kind: .custom("Search"), used: used, limit: limit, resetAt: resetAt, unit: .requests, windowStart: resetAt?.addingTimeInterval(-3600)))
         }
 
         if windows.isEmpty {
@@ -203,9 +208,9 @@ final class SyntheticProvider: UsageProvider {
         return "Request failed (HTTP \(statusCode))."
     }
 
-    private func makeWindow(kind: WindowKind, used: Double, limit: Double, resetAt: Date?, unit: UsageUnit) -> Window {
+    private func makeWindow(kind: WindowKind, used: Double, limit: Double, resetAt: Date?, unit: UsageUnit, windowStart: Date? = nil) -> Window {
         let percentage = limit > 0 ? min(100, max(0, (used / limit) * 100)) : 0
-        return Window(kind: kind, used: used, limit: limit, unit: unit, percentage: percentage, resetAt: resetAt)
+        return Window(kind: kind, used: used, limit: limit, unit: unit, percentage: percentage, resetAt: resetAt, windowStart: windowStart)
     }
 
     private static func stringValue(_ value: Any?) -> String? {
@@ -226,5 +231,21 @@ final class SyntheticProvider: UsageProvider {
         if let value = value as? String { return TimeHelpers.parseISODate(value) }
         guard let numeric = doubleValue(value) else { return nil }
         return Date(timeIntervalSince1970: numeric > 10_000_000_000 ? numeric / 1000 : numeric)
+    }
+
+    private static func nextWeekBoundary(from date: Date = Date()) -> Date? {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        let weekday = calendar.component(.weekday, from: date)
+        let daysUntilNextWeek = ((8 - weekday) % 7 == 0) ? 7 : (8 - weekday) % 7
+        let startOfDay = calendar.startOfDay(for: date)
+        return calendar.date(byAdding: .day, value: daysUntilNextWeek, to: startOfDay)
+    }
+
+    private static func previousMonthBoundary(for resetAt: Date?) -> Date? {
+        guard let resetAt else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        return calendar.date(byAdding: .month, value: -1, to: resetAt)
     }
 }

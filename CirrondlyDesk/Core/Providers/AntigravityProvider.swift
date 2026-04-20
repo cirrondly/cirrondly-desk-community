@@ -253,7 +253,8 @@ final class AntigravityProvider: UsageProvider {
                     limit: 100,
                     unit: .requests,
                     percentage: usedPercentage,
-                    resetAt: quota.resetAt
+                    resetAt: quota.resetAt,
+                    windowStart: quota.resetAt?.addingTimeInterval(-30 * 24 * 60 * 60)
                 )
             }
     }

@@ -1,4 +1,7 @@
+import AppKit
 import SwiftUI
+
+let settingsWindowIdentifier = NSUserInterfaceItemIdentifier("com.cirrondly.settings")
 
 enum SettingsPaneTab: String, Hashable {
     case general
@@ -40,6 +43,32 @@ struct SettingsScene: View {
             .tint(Color.cirrondlyBlueDark)
             .foregroundStyle(Color.cirrondlyBlueDark)
             .padding(24)
+        }
+        .background(SettingsWindowConfigurator())
+    }
+}
+
+private struct SettingsWindowConfigurator: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView(frame: .zero)
+        DispatchQueue.main.async {
+            configureWindow(for: view)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            configureWindow(for: nsView)
+        }
+    }
+
+    private func configureWindow(for view: NSView) {
+        guard let window = view.window else { return }
+        window.identifier = settingsWindowIdentifier
+        window.appearance = NSAppearance(named: .aqua)
+        if window.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            window.title = "Settings"
         }
     }
 }

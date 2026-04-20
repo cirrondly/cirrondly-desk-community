@@ -11,11 +11,13 @@ struct SessionProgressBar: View {
                     .font(Typography.body(12, weight: .semibold))
                     .foregroundStyle(Color.cirrondlyBlueDark)
                 Spacer()
-                Text("\(Int(window.percentage.rounded()))%")
-                    .font(Typography.mono(11))
-                    .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.8))
+                if window.percentage > 0 {
+                    Text("\(Int(window.percentage.rounded()))%")
+                        .font(Typography.mono(11))
+                        .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.8))
+                }
                 if let resetAt = window.resetAt {
-                    TimeToResetBadge(text: TimeHelpers.relativeResetString(until: resetAt))
+                    TimeToResetBadge(resetAt: resetAt)
                 }
             }
 
@@ -28,6 +30,16 @@ struct SessionProgressBar: View {
                 }
             }
             .frame(height: 8)
+
+            if let resetTimestamp {
+                Text("Resets \(resetTimestamp)")
+                    .font(.caption)
+                    .foregroundStyle(Color.cirrondlyBlack.opacity(0.56))
+            }
+
+            if let forecast = window.forecast {
+                ForecastCaption(forecast: forecast)
+            }
 
             HStack(spacing: 8) {
                 metricLabel(title: "Usage", value: usageSummary)
@@ -73,10 +85,11 @@ struct SessionProgressBar: View {
     }
 
     private var timeLeftSummary: String? {
-        guard let resetAt = window.resetAt else {
-            return nil
-        }
-        return TimeHelpers.relativeResetString(until: resetAt)
+        TimeHelpers.relativeResetString(until: window.resetAt)
+    }
+
+    private var resetTimestamp: String? {
+        TimeHelpers.resetTimestampString(at: window.resetAt)
     }
 
     private var unitLabel: String {

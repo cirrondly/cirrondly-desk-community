@@ -8,6 +8,7 @@ struct CirrondlyDeskApp: App {
         Settings {
             SettingsScene()
                 .environmentObject(appDelegate.container)
+                .preferredColorScheme(.light)
         }
     }
 }

@@ -10,7 +10,7 @@ struct AllSetView: View {
                 .font(Typography.body(20, weight: .semibold))
             Text("Cirrondly Desk will keep polling locally in the background.")
                 .font(Typography.body(14))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.cirrondlyBlack.opacity(0.68))
         }
         .padding(24)
     }

@@ -414,7 +414,8 @@ final class KiroProvider: UsageProvider {
                 limit: primary.usageLimit,
                 unit: .credits,
                 percentage: percentage(used: primary.currentUsage, limit: primary.usageLimit),
-                resetAt: primary.resetDate
+                resetAt: primary.resetDate,
+                windowStart: previousMonthlyBoundary(for: primary.resetDate)
             )
         ]
 
@@ -426,7 +427,8 @@ final class KiroProvider: UsageProvider {
                     limit: freeTrial.usageLimit,
                     unit: .credits,
                     percentage: percentage(used: freeTrial.currentUsage, limit: freeTrial.usageLimit),
-                    resetAt: freeTrial.expiryDate
+                    resetAt: freeTrial.expiryDate,
+                    windowStart: previousMonthlyBoundary(for: freeTrial.expiryDate)
                 )
             )
         }
@@ -438,7 +440,8 @@ final class KiroProvider: UsageProvider {
                 limit: bonus.usageLimit,
                 unit: .credits,
                 percentage: percentage(used: bonus.currentUsage, limit: bonus.usageLimit),
-                resetAt: bonus.expiryDate
+                resetAt: bonus.expiryDate,
+                windowStart: previousMonthlyBoundary(for: bonus.expiryDate)
             )
         })
 
@@ -447,6 +450,13 @@ final class KiroProvider: UsageProvider {
 
     private func pickPrimaryBreakdown(_ breakdowns: [KiroBreakdown]) -> KiroBreakdown? {
         breakdowns.first { $0.type == "CREDIT" } ?? breakdowns.first
+    }
+
+    private func previousMonthlyBoundary(for resetDate: Date?) -> Date? {
+        guard let resetDate else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        return calendar.date(byAdding: .month, value: -1, to: resetDate)
     }
 
     private func normalizeAPISnapshot(_ payload: [String: Any], timestamp: Date?, source: DataSource) -> KiroSnapshot? {

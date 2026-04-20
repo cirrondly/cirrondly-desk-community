@@ -60,6 +60,19 @@ enum UsageUnit: String, Codable, Hashable {
     case dollars
 }
 
+enum ForecastStatus: String, Codable, Hashable {
+    case onTrack
+    case tight
+    case willExceed
+}
+
+struct Forecast: Codable, Hashable {
+    let projectedUsageAtReset: Double
+    let projectedPercentageAtReset: Double
+    let status: ForecastStatus
+    let timeToDepletion: TimeInterval?
+}
+
 enum DataSource: String, Codable, Hashable {
     case local
     case api
@@ -109,6 +122,35 @@ struct Window: Identifiable, Codable, Hashable {
     let unit: UsageUnit
     let percentage: Double
     let resetAt: Date?
+    let windowStart: Date?
+    let forecast: Forecast?
+
+    init(
+        kind: WindowKind,
+        used: Double,
+        limit: Double?,
+        unit: UsageUnit,
+        percentage: Double,
+        resetAt: Date?,
+        windowStart: Date? = nil,
+        forecast: Forecast? = nil
+    ) {
+        self.kind = kind
+        self.used = used
+        self.limit = limit
+        self.unit = unit
+        self.percentage = percentage
+        self.resetAt = resetAt
+
+        let inferredWindowStart = windowStart ?? ForecastCalculator.inferredWindowStart(kind: kind, resetAt: resetAt)
+        self.windowStart = inferredWindowStart
+        self.forecast = forecast ?? ForecastCalculator.forecastUsage(
+            used: used,
+            limit: limit,
+            windowStart: inferredWindowStart,
+            windowEnd: resetAt
+        )
+    }
 }
 
 struct ProviderResult: Identifiable, Codable, Hashable {

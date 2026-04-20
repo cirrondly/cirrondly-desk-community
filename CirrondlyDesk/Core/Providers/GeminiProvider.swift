@@ -339,7 +339,7 @@ final class GeminiProvider: UsageProvider {
     private func makeQuotaWindow(label: String, bucket: GeminiBucket) -> Window {
         let remaining = min(max(bucket.remainingFraction, 0), 1)
         let used = (1 - remaining) * 100
-        return Window(kind: .custom(label), used: used, limit: 100, unit: .requests, percentage: used, resetAt: bucket.resetTime)
+        return Window(kind: .custom(label), used: used, limit: 100, unit: .requests, percentage: used, resetAt: bucket.resetTime, windowStart: bucket.resetTime?.addingTimeInterval(-24 * 60 * 60))
     }
 
     private func mapTierToPlan(_ tier: String?, idPayload: [String: Any]?) -> String? {

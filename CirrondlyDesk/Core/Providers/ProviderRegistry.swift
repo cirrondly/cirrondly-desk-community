@@ -41,4 +41,10 @@ final class ProviderRegistry: ObservableObject {
         provider.isEnabled = enabled
         providers = providers.map { $0 }
     }
+
+    func setActiveProfile(_ profile: ProviderProfile, for id: String) {
+        guard let provider = provider(id: id) else { return }
+        provider.activeProfile = profile
+        providers = providers.map { $0 }
+    }
 }

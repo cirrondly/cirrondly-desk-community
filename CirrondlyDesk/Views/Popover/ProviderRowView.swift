@@ -2,6 +2,8 @@ import AppKit
 import SwiftUI
 
 struct ProviderRowView: View {
+    @EnvironmentObject private var container: DependencyContainer
+
     let provider: ProviderResult
 
     var body: some View {
@@ -52,6 +54,8 @@ struct ProviderRowView: View {
                         .foregroundStyle(warning.level == .critical ? Color.cirrondlyCriticalRed : Color.cirrondlyBlueDark.opacity(0.65))
                 }
             }
+
+            ProviderHistoryButton(provider: provider, window: preferredHistoryWindow)
         }
         .padding(14)
         .background(Color.cirrondlyWhiteCard.opacity(0.92), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -86,6 +90,38 @@ struct ProviderRowView: View {
 
     private var categoryBorder: Color {
         brandColor.opacity(0.3)
+    }
+
+    private var preferredHistoryWindow: Window {
+        provider.primaryWindow ?? provider.windows.first ?? provider.fallbackHistoryWindow
+    }
+}
+
+private struct ProviderHistoryButton: View {
+    @EnvironmentObject private var container: DependencyContainer
+
+    let provider: ProviderResult
+    let window: Window
+
+    var body: some View {
+        Button {
+            container.historyWindowManager.openHistoryWindow(for: provider, window: window)
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "chart.bar")
+                    .font(.system(size: 11, weight: .medium))
+
+                Text("History")
+                    .font(.custom("Inter-Regular", size: 12))
+
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 9, weight: .medium))
+            }
+            .foregroundStyle(Color.cirrondlyBlueDark)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 8)
+        .frame(maxWidth: .infinity, alignment: .trailing)
     }
 }
 

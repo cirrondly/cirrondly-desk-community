@@ -85,7 +85,8 @@ final class ZAIProvider: UsageProvider {
            total > 0 {
             let used = Self.doubleValue(webLimit["currentValue"]) ?? 0
             let percentage = min(100, max(0, (used / total) * 100))
-            windows.append(Window(kind: .custom("Web Searches"), used: used, limit: total, unit: .requests, percentage: percentage, resetAt: Self.dateValue(webLimit["nextResetTime"]) ?? nextMonthBoundary()))
+            let resetAt = Self.dateValue(webLimit["nextResetTime"]) ?? nextMonthBoundary()
+            windows.append(Window(kind: .custom("Web Searches"), used: used, limit: total, unit: .requests, percentage: percentage, resetAt: resetAt, windowStart: previousMonthBoundary(for: resetAt)))
         }
 
         return ProviderResult(
@@ -168,6 +169,12 @@ final class ZAIProvider: UsageProvider {
         let now = Date()
         let components = calendar.dateComponents([.year, .month], from: now)
         return calendar.date(from: DateComponents(timeZone: TimeZone(secondsFromGMT: 0), year: components.year, month: (components.month ?? 1) + 1, day: 1)) ?? now
+    }
+
+    private func previousMonthBoundary(for resetDate: Date?) -> Date? {
+        guard let resetDate else { return nil }
+        let calendar = Calendar(identifier: .gregorian)
+        return calendar.date(byAdding: .month, value: -1, to: resetDate)
     }
 
     private static func stringValue(_ value: Any?) -> String? {

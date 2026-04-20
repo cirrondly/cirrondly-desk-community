@@ -67,26 +67,11 @@ struct ProviderServiceStatusView: View {
     }
 
     private var pillLabel: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(indicatorColor)
-                .frame(width: 7, height: 7)
-
-            Text(status.label)
-                .font(Typography.body(10, weight: .semibold))
-
-            if status.statusPageURL != nil {
-                Image(systemName: "arrow.up.right")
-                    .font(.system(size: 8, weight: .bold))
+        ServiceStatusChip(
+            status: status.health,
+            onTap: status.statusPageURL.map { url in
+                { openURL(url) }
             }
-        }
-        .foregroundStyle(indicatorColor)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(indicatorBackground, in: Capsule())
-        .overlay(
-            Capsule()
-                .stroke(indicatorColor.opacity(0.22), lineWidth: 1)
         )
     }
 
@@ -136,20 +121,58 @@ struct ProviderServiceStatusView: View {
             return Color.cirrondlyBlueDark.opacity(0.55)
         }
     }
+}
 
-    private var indicatorBackground: Color {
-        switch status.health {
-        case .checking:
-            return Color.cirrondlyBlueLightest
-        case .operational:
-            return Color.cirrondlyGreenAccent.opacity(0.14)
-        case .degraded:
-            return Color.cirrondlyWarningOrange.opacity(0.14)
-        case .outage:
-            return Color.cirrondlyCriticalRed.opacity(0.12)
-        case .unknown:
-            return Color.cirrondlyBlueLightest.opacity(0.88)
+struct ServiceStatusChip: View {
+    let status: ProviderServiceHealth
+    let onTap: (() -> Void)?
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(dotColor)
+                .frame(width: 6, height: 6)
+
+            Text(label)
+                .font(.custom("Inter-Regular", size: 12))
+                .foregroundStyle(Color.cirrondlyBlack)
+
+            if onTap != nil {
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 10, weight: .regular))
+                    .foregroundStyle(Color.cirrondlyBlack.opacity(0.4))
+            }
         }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .background(Color.clear)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.cirrondlyBlack.opacity(0.15), lineWidth: 1)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .onTapGesture {
+            onTap?()
+        }
+    }
+
+    private var dotColor: Color {
+        switch status {
+        case .checking:
+            return Color.cirrondlyBlueMid
+        case .operational:
+            return Color.cirrondlyGreenAccent
+        case .degraded:
+            return Color.cirrondlyWarningOrange
+        case .outage:
+            return Color.cirrondlyCriticalRed
+        case .unknown:
+            return Color.cirrondlyBlack.opacity(0.3)
+        }
+    }
+
+    private var label: String {
+        status.label
     }
 }
 

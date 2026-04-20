@@ -14,6 +14,7 @@ final class DependencyContainer: ObservableObject {
     let statusLineExporter: StatusLineExporter
     let launchAtLoginService: LaunchAtLoginService
     let updateChecker: UpdateChecker
+    let historyWindowManager: ProviderHistoryWindowManager
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -26,6 +27,7 @@ final class DependencyContainer: ObservableObject {
         statusLineExporter = StatusLineExporter()
         launchAtLoginService = LaunchAtLoginService()
         updateChecker = UpdateChecker()
+        historyWindowManager = ProviderHistoryWindowManager()
         pollingManager = PollingManager(usageAggregator: usageAggregator, serviceStatusMonitor: serviceStatusMonitor, exporter: statusLineExporter, notifications: notificationService)
 
         bindObjectChanges()

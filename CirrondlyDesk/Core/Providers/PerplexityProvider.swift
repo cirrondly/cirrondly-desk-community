@@ -73,7 +73,8 @@ final class PerplexityProvider: UsageProvider {
         if let balanceUSD = readBalanceUSD(group) {
             let usedUSD = sumUsageCostUSD(restState.usageAnalytics) ?? 0
             if balanceUSD > 0 {
-                windows.append(makeWindow(kind: .custom("API credits"), used: usedUSD, limit: balanceUSD, resetAt: nil))
+                let resetAt = TimeHelpers.nextMonthBoundary()
+                windows.append(makeWindow(kind: .custom("API credits"), used: usedUSD, limit: balanceUSD, resetAt: resetAt, windowStart: resetAt.flatMap { ForecastCalculator.inferredWindowStart(kind: .monthly, resetAt: $0) }))
             }
         }
 
@@ -348,9 +349,9 @@ final class PerplexityProvider: UsageProvider {
         }
     }
 
-    private func makeWindow(kind: WindowKind, used: Double, limit: Double, resetAt: Date?) -> Window {
+    private func makeWindow(kind: WindowKind, used: Double, limit: Double, resetAt: Date?, windowStart: Date? = nil) -> Window {
         let percentage = limit > 0 ? min(100, max(0, (used / limit) * 100)) : 0
-        return Window(kind: kind, used: used, limit: limit, unit: .dollars, percentage: percentage, resetAt: resetAt)
+        return Window(kind: kind, used: used, limit: limit, unit: .dollars, percentage: percentage, resetAt: resetAt, windowStart: windowStart)
     }
 
     private static func stringValue(_ value: Any?) -> String? {

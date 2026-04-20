@@ -93,7 +93,7 @@ final class CursorProvider: UsageProvider {
         if let api = makePercentWindow(label: "API usage", value: planUsage["apiPercentUsed"], resetAt: billingCycleEnd) {
             windows.append(api)
         }
-        if let onDemand = makeOnDemandWindow(spendLimitUsage: usage["spendLimitUsage"] as? [String: Any]) {
+        if let onDemand = makeOnDemandWindow(spendLimitUsage: usage["spendLimitUsage"] as? [String: Any], resetAt: billingCycleEnd) {
             windows.append(onDemand)
         }
 
@@ -321,19 +321,20 @@ final class CursorProvider: UsageProvider {
         let totalSpend = numberValue(planUsage["totalSpend"])
         let remaining = numberValue(planUsage["remaining"])
         let totalPercentUsed = numberValue(planUsage["totalPercentUsed"])
+        let windowStart = billingCycleStart(for: resetAt)
 
         if isTeamAccount, let limit, limit > 0 {
             let used = totalSpend ?? (remaining.map { limit - $0 } ?? 0)
-            return Window(kind: .custom("Total usage"), used: used, limit: limit, unit: .dollars, percentage: min(100, max(0, (used / limit) * 100)), resetAt: resetAt)
+            return Window(kind: .custom("Total usage"), used: used, limit: limit, unit: .dollars, percentage: min(100, max(0, (used / limit) * 100)), resetAt: resetAt, windowStart: windowStart)
         }
 
         if let totalPercentUsed {
-            return Window(kind: .custom("Total usage"), used: totalPercentUsed, limit: 100, unit: .requests, percentage: min(100, max(0, totalPercentUsed)), resetAt: resetAt)
+            return Window(kind: .custom("Total usage"), used: totalPercentUsed, limit: 100, unit: .requests, percentage: min(100, max(0, totalPercentUsed)), resetAt: resetAt, windowStart: windowStart)
         }
 
         if let limit, let used = totalSpend ?? (remaining.map { limit - $0 }), limit > 0 {
             let percentage = min(100, max(0, (used / limit) * 100))
-            return Window(kind: .custom("Total usage"), used: percentage, limit: 100, unit: .requests, percentage: percentage, resetAt: resetAt)
+            return Window(kind: .custom("Total usage"), used: percentage, limit: 100, unit: .requests, percentage: percentage, resetAt: resetAt, windowStart: windowStart)
         }
 
         return nil
@@ -341,16 +342,23 @@ final class CursorProvider: UsageProvider {
 
     private func makePercentWindow(label: String, value: Any?, resetAt: Date?) -> Window? {
         guard let percent = numberValue(value) else { return nil }
-        return Window(kind: .custom(label), used: percent, limit: 100, unit: .requests, percentage: min(100, max(0, percent)), resetAt: resetAt)
+        return Window(kind: .custom(label), used: percent, limit: 100, unit: .requests, percentage: min(100, max(0, percent)), resetAt: resetAt, windowStart: billingCycleStart(for: resetAt))
     }
 
-    private func makeOnDemandWindow(spendLimitUsage: [String: Any]?) -> Window? {
+    private func makeOnDemandWindow(spendLimitUsage: [String: Any]?, resetAt: Date?) -> Window? {
         guard let spendLimitUsage else { return nil }
         let limit = numberValue(spendLimitUsage["individualLimit"]) ?? numberValue(spendLimitUsage["pooledLimit"]) ?? 0
         let remaining = numberValue(spendLimitUsage["individualRemaining"]) ?? numberValue(spendLimitUsage["pooledRemaining"]) ?? 0
         guard limit > 0 else { return nil }
         let used = limit - remaining
-        return Window(kind: .custom("On-demand"), used: used, limit: limit, unit: .dollars, percentage: min(100, max(0, (used / limit) * 100)), resetAt: nil)
+        return Window(kind: .custom("On-demand"), used: used, limit: limit, unit: .dollars, percentage: min(100, max(0, (used / limit) * 100)), resetAt: resetAt, windowStart: billingCycleStart(for: resetAt))
+    }
+
+    private func billingCycleStart(for resetAt: Date?) -> Date? {
+        guard let resetAt else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        return calendar.date(byAdding: .month, value: -1, to: resetAt)
     }
 
     private func numberValue(_ value: Any?) -> Double? {

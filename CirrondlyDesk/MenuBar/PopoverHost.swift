@@ -14,8 +14,13 @@ final class PopoverHost: NSObject, NSPopoverDelegate {
         popover.behavior = .applicationDefined
         popover.animates = true
         popover.delegate = self
+        popover.appearance = NSAppearance(named: .aqua)
         popover.contentSize = NSSize(width: 420, height: 600)
-        popover.contentViewController = NSHostingController(rootView: PopoverRootView().environmentObject(container))
+        popover.contentViewController = NSHostingController(
+            rootView: PopoverRootView()
+                .environmentObject(container)
+                .preferredColorScheme(.light)
+        )
     }
 
     func toggle(relativeTo button: NSStatusBarButton, onOpen: @escaping () -> Void, onClose: @escaping () -> Void) {
@@ -23,6 +28,7 @@ final class PopoverHost: NSObject, NSPopoverDelegate {
             close(onClose: onClose)
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            popover.contentViewController?.view.window?.appearance = NSAppearance(named: .aqua)
             installEventMonitors(onClose: onClose)
             onOpen()
         }

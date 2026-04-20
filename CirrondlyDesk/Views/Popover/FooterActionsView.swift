@@ -19,7 +19,7 @@ struct FooterActionsView: View {
             .disabled(container.usageAggregator.isRefreshing)
 
             Button {
-                openSettings()
+                openSettingsReliably()
             } label: {
                 Label("Settings", systemImage: "gearshape")
             }
@@ -33,6 +33,48 @@ struct FooterActionsView: View {
             .footerActionStyle()
         }
         .font(Typography.body(12, weight: .semibold))
+    }
+
+    @MainActor
+    private func openSettingsReliably() {
+        NSApp.activate(ignoringOtherApps: true)
+
+        if focusExistingSettingsWindow() {
+            return
+        }
+
+        openSettings()
+
+        DispatchQueue.main.async {
+            NSApp.activate(ignoringOtherApps: true)
+            _ = focusExistingSettingsWindow()
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            NSApp.activate(ignoringOtherApps: true)
+            _ = focusExistingSettingsWindow()
+        }
+    }
+
+    @MainActor
+    @discardableResult
+    private func focusExistingSettingsWindow() -> Bool {
+        guard let window = settingsWindow else { return false }
+        if window.isMiniaturized {
+            window.deminiaturize(nil)
+        }
+        window.orderFrontRegardless()
+        window.makeKeyAndOrderFront(nil)
+        return true
+    }
+
+    private var settingsWindow: NSWindow? {
+        NSApp.windows.first(where: { $0.identifier == settingsWindowIdentifier })
+            ?? NSApp.windows.first(where: { window in
+                window.frame.width >= 700
+                    && window.frame.height >= 500
+                    && window.styleMask.contains(.titled)
+            })
     }
 }
 

@@ -114,14 +114,14 @@ final class FactoryProvider: UsageProvider {
            let limit = Self.doubleValue(standard["totalAllowance"]),
            limit > 0 {
             let used = Self.doubleValue(standard["orgTotalTokensUsed"]) ?? 0
-            windows.append(makeWindow(kind: .custom("Standard"), used: used, limit: limit, resetAt: resetAt))
+            windows.append(makeWindow(kind: .custom("Standard"), used: used, limit: limit, resetAt: resetAt, windowStart: startDate))
         }
 
         if let premium = usage["premium"] as? [String: Any],
            let limit = Self.doubleValue(premium["totalAllowance"]),
            limit > 0 {
             let used = Self.doubleValue(premium["orgTotalTokensUsed"]) ?? 0
-            windows.append(makeWindow(kind: .custom("Premium"), used: used, limit: limit, resetAt: resetAt))
+            windows.append(makeWindow(kind: .custom("Premium"), used: used, limit: limit, resetAt: resetAt, windowStart: startDate))
         }
 
         return ProviderResult(
@@ -318,9 +318,9 @@ final class FactoryProvider: UsageProvider {
         return nil
     }
 
-    private func makeWindow(kind: WindowKind, used: Double, limit: Double, resetAt: Date?) -> Window {
+    private func makeWindow(kind: WindowKind, used: Double, limit: Double, resetAt: Date?, windowStart: Date?) -> Window {
         let percentage = limit > 0 ? min(100, max(0, (used / limit) * 100)) : 0
-        return Window(kind: kind, used: used, limit: limit, unit: .tokens, percentage: percentage, resetAt: resetAt)
+        return Window(kind: kind, used: used, limit: limit, unit: .tokens, percentage: percentage, resetAt: resetAt, windowStart: windowStart)
     }
 
     private func decryptAes256GcmEnvelope(envelope: String, keyB64: String) -> String? {
