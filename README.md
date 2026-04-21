@@ -1,5 +1,7 @@
 # Cirrondly Desk Community
 
+English | [Español](README.es.md) | [Français](README.fr.md)
+
 A native macOS menu bar app that tracks your AI coding tool usage across multiple
 providers locally, privately, for free.
 
