@@ -72,6 +72,11 @@ first launch.
 	<img src="demo/setting%20general.png" alt="General settings and quota alerts" width="420">
 </p>
 
+<p align="center">
+	<img src="demo/forecast.png" alt="Forecast history popup" width="320">
+	<img src="demo/outage.png" alt="Provider outage status" width="320">
+</p>
+
 ## Building from source
 
 ```bash

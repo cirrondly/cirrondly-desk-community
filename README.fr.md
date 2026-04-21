@@ -79,6 +79,11 @@ peut donc afficher un avertissement lors du premier lancement.
 	<img src="demo/setting%20general.png" alt="Réglages généraux et alertes de quota" width="420">
 </p>
 
+<p align="center">
+	<img src="demo/forecast.png" alt="Fenêtre d'historique et forecast" width="320">
+	<img src="demo/outage.png" alt="État d'outage du fournisseur" width="320">
+</p>
+
 ## Compiler depuis les sources
 
 ```bash

@@ -76,6 +76,11 @@ puede mostrar una advertencia en el primer lanzamiento.
 	<img src="demo/setting%20general.png" alt="Configuración general y alertas de cuota" width="420">
 </p>
 
+<p align="center">
+	<img src="demo/forecast.png" alt="Popup de historial y forecast" width="320">
+	<img src="demo/outage.png" alt="Estado de outage del proveedor" width="320">
+</p>
+
 ## Compilar desde el código fuente
 
 ```bash
