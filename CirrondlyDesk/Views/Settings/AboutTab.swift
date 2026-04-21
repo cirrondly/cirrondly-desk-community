@@ -79,6 +79,10 @@ struct AboutTab: View {
                         Button("Report issue") {
                             openURL(URL(string: "https://github.com/cirrondly/cirrondly-desk-community/issues")!)
                         }
+
+                        Button("Join Slack") {
+                            openURL(URL(string: "https://join.slack.com/t/cirrondly/shared_invite/zt-3vvu6usdh-BCKprBTcOj0BiL~QAZNMBw")!)
+                        }
                     }
 
                     Divider()
