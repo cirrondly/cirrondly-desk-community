@@ -5,6 +5,7 @@ import UserNotifications
 final class NotificationService {
     private let center = UNUserNotificationCenter.current()
     private var deliveredKeys = Set<String>()
+    private var lastServiceHealthByName: [String: ProviderServiceHealth] = [:]
 
     func requestAuthorizationIfNeeded() {
         center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
@@ -25,6 +26,31 @@ final class NotificationService {
         }
     }
 
+    func handleServiceStatuses(for providers: [ProviderResult], monitor: ServiceStatusMonitor) {
+        guard serviceStatusNotificationsEnabled else { return }
+
+        let visibleServices = providers.reduce(into: [String: ProviderServiceStatus]()) { partialResult, provider in
+            let status = monitor.status(for: provider.identifier)
+            partialResult[status.serviceName] = status
+        }
+
+        for (serviceName, status) in visibleServices {
+            let previousHealth = lastServiceHealthByName[serviceName]
+            lastServiceHealthByName[serviceName] = status.health
+
+            guard !isQuietHours,
+                  status.health.showsAlert,
+                  previousHealth != status.health else {
+                continue
+            }
+
+            send(
+                title: serviceStatusTitle(for: status),
+                body: serviceStatusBody(for: status)
+            )
+        }
+    }
+
     private var configuredThresholds: [Int] {
         [75, 90, 95, 100].filter { UserDefaults.standard.object(forKey: "notify.threshold.\($0)") as? Bool ?? ($0 == 75 || $0 == 90 || $0 == 100) }
     }
@@ -41,6 +67,10 @@ final class NotificationService {
         return currentHour >= start || currentHour < end
     }
 
+    private var serviceStatusNotificationsEnabled: Bool {
+        UserDefaults.standard.object(forKey: "notify.serviceStatus") as? Bool ?? true
+    }
+
     private func title(for threshold: Int, kind: WindowKind) -> String {
         let label = kind == .weekly ? "Weekly" : "Session"
         switch threshold {
@@ -48,6 +78,28 @@ final class NotificationService {
             return "\(label) limit reached"
         default:
             return "\(label) at \(threshold)%"
+        }
+    }
+
+    private func serviceStatusTitle(for status: ProviderServiceStatus) -> String {
+        switch status.health {
+        case .outage:
+            return "\(status.serviceName) outage detected"
+        case .degraded:
+            return "\(status.serviceName) service degraded"
+        case .checking, .operational, .unknown:
+            return "\(status.serviceName) service update"
+        }
+    }
+
+    private func serviceStatusBody(for status: ProviderServiceStatus) -> String {
+        switch status.health {
+        case .outage:
+            return "Heads up: \(status.serviceName) is not operational right now. \(status.message)"
+        case .degraded:
+            return "Heads up: \(status.serviceName) is having problems right now. \(status.message)"
+        case .checking, .operational, .unknown:
+            return status.message
         }
     }
 

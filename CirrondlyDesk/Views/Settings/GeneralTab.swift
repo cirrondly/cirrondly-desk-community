@@ -4,6 +4,7 @@ struct GeneralTab: View {
     @EnvironmentObject private var container: DependencyContainer
 
     @AppStorage("general.refreshInterval") private var refreshInterval = 300.0
+    @AppStorage("notify.serviceStatus") private var notifyServiceStatus = true
     @AppStorage("notify.threshold.75") private var notify75 = true
     @AppStorage("notify.threshold.90") private var notify90 = true
     @AppStorage("notify.threshold.95") private var notify95 = false
@@ -68,6 +69,16 @@ struct GeneralTab: View {
                         thresholdToggle(title: "90%", binding: $notify90)
                         thresholdToggle(title: "95%", binding: $notify95)
                         thresholdToggle(title: "100%", binding: $notify100)
+                    }
+
+                    Divider()
+
+                    SettingsSplitRow(
+                        title: "Service outages",
+                        subtitle: "Notify me when a tracked provider becomes degraded or goes into outage."
+                    ) {
+                        Toggle("Service outages", isOn: $notifyServiceStatus)
+                            .labelsHidden()
                     }
 
                     Divider()

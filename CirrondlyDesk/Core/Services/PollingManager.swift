@@ -62,5 +62,6 @@ final class PollingManager {
         guard let snapshot = usageAggregator.snapshot else { return }
         exporter.export(snapshot: snapshot)
         notifications.handle(snapshot: snapshot)
+        notifications.handleServiceStatuses(for: snapshot.providers, monitor: serviceStatusMonitor)
     }
 }
