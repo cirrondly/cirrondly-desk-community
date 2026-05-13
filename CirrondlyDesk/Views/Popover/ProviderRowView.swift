@@ -74,11 +74,11 @@ struct ProviderRowView: View {
         guard !trimmed.isEmpty, trimmed != "Default" else {
             switch provider.source {
             case .local:
-                return "Local usage"
+                return L10n.tr("provider.subtitle.localUsage")
             case .api:
-                return "Live account"
+                return L10n.tr("provider.subtitle.liveAccount")
             case .mixed:
-                return "Local + live data"
+                return L10n.tr("provider.subtitle.localAndLiveData")
             }
         }
         return trimmed
@@ -111,7 +111,7 @@ private struct ProviderHistoryButton: View {
                 Image(systemName: "chart.bar")
                     .font(.system(size: 11, weight: .medium))
 
-                Text("History")
+                Text(L10n.tr("provider.history"))
                     .font(.custom("Inter-Regular", size: 12))
 
                 Image(systemName: "arrow.up.right")

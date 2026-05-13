@@ -32,7 +32,7 @@ struct SessionProgressBar: View {
             .frame(height: 8)
 
             if let resetTimestamp {
-                Text("Resets \(resetTimestamp)")
+                Text(L10n.tr("progress.resets", resetTimestamp))
                     .font(.caption)
                     .foregroundStyle(Color.cirrondlyBlack.opacity(0.56))
             }
@@ -42,14 +42,14 @@ struct SessionProgressBar: View {
             }
 
             HStack(spacing: 8) {
-                metricLabel(title: "Usage", value: usageSummary)
+                metricLabel(title: L10n.tr("progress.metric.usage"), value: usageSummary)
 
                 if let remainingSummary {
-                    metricLabel(title: "Remaining", value: remainingSummary)
+                    metricLabel(title: L10n.tr("progress.metric.remaining"), value: remainingSummary)
                 }
 
                 if let timeLeftSummary {
-                    metricLabel(title: "Time left", value: timeLeftSummary)
+                    metricLabel(title: L10n.tr("progress.metric.timeLeft"), value: timeLeftSummary)
                 }
             }
         }
@@ -69,12 +69,12 @@ struct SessionProgressBar: View {
     private var usageSummary: String {
         if let limit = window.limit, limit > 0 {
             if abs(limit - 100) < 0.001, abs(window.used - window.percentage) < 0.001 {
-                return "\(Int(window.used.rounded()))% used"
+                return L10n.tr("progress.usage.percentUsed", "\(Int(window.used.rounded()))")
             }
-            return "\(formatted(window.used)) of \(formatted(limit)) \(unitLabel)"
+            return L10n.tr("progress.usage.ofTotal", formatted(window.used), formatted(limit), unitLabel)
         }
 
-        return "\(formatted(window.used)) \(unitLabel) used"
+        return L10n.tr("progress.usage.usedUnit", formatted(window.used), unitLabel)
     }
 
     private var remainingSummary: String? {
@@ -93,16 +93,7 @@ struct SessionProgressBar: View {
     }
 
     private var unitLabel: String {
-        switch window.unit {
-        case .tokens:
-            return "tokens"
-        case .requests:
-            return "requests"
-        case .credits:
-            return "credits"
-        case .dollars:
-            return "USD"
-        }
+        window.unit.localizedLabel
     }
 
     private func formatted(_ value: Double) -> String {

@@ -10,9 +10,9 @@ struct FooterActionsView: View {
                 Task { await container.pollingManager.forceRefresh() }
             } label: {
                 if container.usageAggregator.isRefreshing {
-                    Label("Refreshing", systemImage: "arrow.triangle.2.circlepath")
+                    Label(L10n.tr("popover.footer.refreshing"), systemImage: "arrow.triangle.2.circlepath")
                 } else {
-                    Label("Refresh", systemImage: "arrow.clockwise")
+                    Label(L10n.tr("popover.footer.refresh"), systemImage: "arrow.clockwise")
                 }
             }
             .footerActionStyle()
@@ -21,14 +21,14 @@ struct FooterActionsView: View {
             Button {
                 openSettingsReliably()
             } label: {
-                Label("Settings", systemImage: "gearshape")
+                Label(L10n.tr("popover.footer.settings"), systemImage: "gearshape")
             }
             .footerActionStyle()
 
             Button {
                 NSApp.terminate(nil)
             } label: {
-                Label("Quit", systemImage: "xmark.circle")
+                Label(L10n.tr("popover.footer.quit"), systemImage: "xmark.circle")
             }
             .footerActionStyle()
         }

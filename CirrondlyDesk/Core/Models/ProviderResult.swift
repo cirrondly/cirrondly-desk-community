@@ -9,13 +9,13 @@ enum ProviderCategory: String, Codable, CaseIterable, Hashable {
     var title: String {
         switch self {
         case .subscription:
-            return "Subscription"
+            return L10n.tr("provider.category.subscription")
         case .api:
-            return "API"
+            return L10n.tr("provider.category.api")
         case .usageBased:
-            return "Usage Based"
+            return L10n.tr("provider.category.usageBased")
         case .free:
-            return "Free"
+            return L10n.tr("provider.category.free")
         }
     }
 }
@@ -29,11 +29,11 @@ enum WindowKind: Codable, Hashable {
     var title: String {
         switch self {
         case .fiveHour:
-            return "Session"
+            return L10n.tr("window.title.session")
         case .weekly:
-            return "Weekly"
+            return L10n.tr("window.title.weekly")
         case .monthly:
-            return "Monthly"
+            return L10n.tr("window.title.monthly")
         case .custom(let name):
             return name
         }
@@ -58,6 +58,32 @@ enum UsageUnit: String, Codable, Hashable {
     case requests
     case credits
     case dollars
+
+    var localizedLabel: String {
+        switch self {
+        case .tokens:
+            return L10n.tr("unit.tokens")
+        case .requests:
+            return L10n.tr("unit.requests")
+        case .credits:
+            return L10n.tr("unit.credits")
+        case .dollars:
+            return "USD"
+        }
+    }
+
+    var localizedChartLabel: String {
+        switch self {
+        case .tokens:
+            return L10n.tr("unit.tokens.chart")
+        case .requests:
+            return L10n.tr("unit.requests.chart")
+        case .credits:
+            return L10n.tr("unit.credits.chart")
+        case .dollars:
+            return "USD"
+        }
+    }
 }
 
 enum ForecastStatus: String, Codable, Hashable {

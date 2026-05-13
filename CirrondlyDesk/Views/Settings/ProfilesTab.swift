@@ -8,7 +8,7 @@ struct ProfilesTab: View {
             ForEach(Array(container.providerRegistry.providers.enumerated()), id: \.element.identifier) { _, provider in
                 Section(provider.displayName) {
                     if provider.profiles.isEmpty {
-                        Text("No local profiles detected")
+                        Text(L10n.tr("settings.profiles.empty.noLocalProfiles"))
                             .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.72))
                     } else {
                         ForEach(provider.profiles) { profile in
@@ -20,7 +20,7 @@ struct ProfilesTab: View {
                                                 .font(Typography.body(12, weight: .semibold))
 
                                             if profile.matches(provider.activeProfile) {
-                                                Text("active")
+                                                Text(L10n.tr("settings.profiles.status.active"))
                                                     .font(Typography.body(10, weight: .semibold))
                                                     .foregroundStyle(Color.cirrondlyGreenAccent)
                                             }
@@ -41,7 +41,7 @@ struct ProfilesTab: View {
 
                                     Spacer()
 
-                                    Button(profile.matches(provider.activeProfile) ? "Active" : "Make Active") {
+                                    Button(profile.matches(provider.activeProfile) ? L10n.tr("settings.profiles.button.active") : L10n.tr("settings.profiles.button.makeActive")) {
                                         container.providerRegistry.setActiveProfile(profile, for: provider.identifier)
                                         Task {
                                             await container.usageAggregator.refresh(force: true)
@@ -63,6 +63,6 @@ struct ProfilesTab: View {
 
     private func lastUsedText(for profile: ProviderProfile) -> String? {
         guard let lastUsedAt = profile.lastUsedAt else { return nil }
-        return "Last used: \(RelativeDateTimeFormatter().localizedString(for: lastUsedAt, relativeTo: Date()))"
+        return L10n.tr("settings.profiles.lastUsed", RelativeDateTimeFormatter().localizedString(for: lastUsedAt, relativeTo: Date()))
     }
 }

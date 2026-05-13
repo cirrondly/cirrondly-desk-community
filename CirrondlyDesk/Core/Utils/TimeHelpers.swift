@@ -36,14 +36,7 @@ enum TimeHelpers {
         guard let date else { return nil }
         let remaining = Int(date.timeIntervalSinceNow)
         guard remaining > 0 else { return nil }
-        let days = remaining / 86_400
-        let hours = (remaining % 86_400) / 3_600
-        let minutes = (remaining % 3_600) / 60
-
-        if days > 0 { return "\(days)d \(hours)h" }
-        if hours > 0 { return "\(hours)h \(minutes)m" }
-        if minutes > 0 { return "\(minutes)m" }
-        return "<1m"
+        return compactDurationString(seconds: TimeInterval(remaining), approximate: false)
     }
 
     static func absoluteResetString(at date: Date?) -> String? {
@@ -63,5 +56,23 @@ enum TimeHelpers {
 
     static func startOfDay(for date: Date) -> Date {
         Calendar.current.startOfDay(for: date)
+    }
+
+    static func compactDurationString(seconds: TimeInterval, approximate: Bool) -> String {
+        let totalSeconds = max(0, Int(seconds.rounded()))
+        let days = totalSeconds / 86_400
+        let hours = (totalSeconds % 86_400) / 3_600
+        let minutes = (totalSeconds % 3_600) / 60
+
+        if days > 0 {
+            return L10n.tr(approximate ? "time.compact.approx.daysHours" : "time.compact.daysHours", "\(days)", "\(hours)")
+        }
+        if hours > 0 {
+            return L10n.tr(approximate ? "time.compact.approx.hoursMinutes" : "time.compact.hoursMinutes", "\(hours)", "\(minutes)")
+        }
+        if minutes > 0 {
+            return L10n.tr(approximate ? "time.compact.approx.minutes" : "time.compact.minutes", "\(minutes)")
+        }
+        return L10n.tr(approximate ? "time.compact.approx.underMinute" : "time.compact.underMinute")
     }
 }

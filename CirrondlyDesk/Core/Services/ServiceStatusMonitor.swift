@@ -10,15 +10,15 @@ enum ProviderServiceHealth: String, Codable, Hashable, Sendable {
     var label: String {
         switch self {
         case .checking:
-            return "Checking"
+            return L10n.tr("service.health.checking")
         case .operational:
-            return "Operational"
+            return L10n.tr("service.health.operational")
         case .degraded:
-            return "Degraded"
+            return L10n.tr("service.health.degraded")
         case .outage:
-            return "Outage"
+            return L10n.tr("service.health.outage")
         case .unknown:
-            return "Unknown"
+            return L10n.tr("service.health.unknown")
         }
     }
 

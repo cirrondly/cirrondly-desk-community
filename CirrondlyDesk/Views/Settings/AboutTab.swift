@@ -6,7 +6,7 @@ struct AboutTab: View {
 
     var body: some View {
         SettingsPaneScroll {
-            SettingsSectionCard(title: "Cirrondly Desk Community", subtitle: "Native macOS usage tracking for AI tools across your desktop.", eyebrow: "About") {
+            SettingsSectionCard(title: L10n.tr("settings.about.app.cardTitle"), subtitle: L10n.tr("settings.about.app.cardSubtitle"), eyebrow: L10n.tr("settings.tab.about")) {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(spacing: 14) {
                         Image("CloudLogo")
@@ -15,7 +15,7 @@ struct AboutTab: View {
                             .frame(width: 58, height: 38)
 
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("Cirrondly Desk Community")
+                            Text(L10n.tr("settings.about.app.cardTitle"))
                                 .font(Typography.body(24, weight: .semibold))
                             Text(versionString)
                                 .font(Typography.body(12))
@@ -27,33 +27,33 @@ struct AboutTab: View {
                         SettingsBadge(title: "macOS", tint: .cirrondlyBlueDark)
                     }
 
-                    Text("Track provider limits, burn rate, and credits in the menu bar without sending your local usage anywhere.")
+                    Text(L10n.tr("settings.about.app.body"))
                         .font(Typography.body(12))
                         .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.72))
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
 
-            SettingsSectionCard(title: "Updates", subtitle: "Manual update checks stay available from inside settings.", eyebrow: "Release") {
+            SettingsSectionCard(title: L10n.tr("settings.about.updates.cardTitle"), subtitle: L10n.tr("settings.about.updates.cardSubtitle"), eyebrow: L10n.tr("settings.about.updates.eyebrow")) {
                 VStack(alignment: .leading, spacing: 14) {
                     SettingsSectionHeader(
-                        title: "Release channel",
-                        subtitle: "Use a manual check when you want to pull the latest build without waiting for the background updater.",
-                        eyebrow: "Release"
+                        title: L10n.tr("settings.about.updates.headerTitle"),
+                        subtitle: L10n.tr("settings.about.updates.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.about.updates.eyebrow")
                     )
 
-                    Button("Check for updates") {
+                    Button(L10n.tr("settings.about.updates.button")) {
                         Task { await container.updateChecker.checkForUpdatesIfNeeded() }
                     }
                 }
             }
 
-            SettingsSectionCard(title: "Inspired by Open Source", subtitle: "Provider support in Cirrondly Desk Community builds on ideas, research, and prior open source work from these projects.", eyebrow: "Credits") {
+            SettingsSectionCard(title: L10n.tr("settings.about.credits.cardTitle"), subtitle: L10n.tr("settings.about.credits.cardSubtitle"), eyebrow: L10n.tr("settings.about.credits.eyebrow")) {
                 VStack(alignment: .leading, spacing: 14) {
                     SettingsSectionHeader(
-                        title: "Inspired by Open Source",
-                        subtitle: "Provider support in Cirrondly Desk Community builds on ideas, research, and prior open source work from these projects.",
-                        eyebrow: "Credits"
+                        title: L10n.tr("settings.about.credits.headerTitle"),
+                        subtitle: L10n.tr("settings.about.credits.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.about.credits.eyebrow")
                     )
 
                     attributionLink(title: "robinebers/openusage", url: "https://github.com/robinebers/openusage")
@@ -63,31 +63,31 @@ struct AboutTab: View {
                 }
             }
 
-            SettingsSectionCard(title: "Community", subtitle: "Cirrondly Desk Community is open source and maintained in public.", eyebrow: "Open Source") {
+            SettingsSectionCard(title: L10n.tr("settings.about.community.cardTitle"), subtitle: L10n.tr("settings.about.community.cardSubtitle"), eyebrow: L10n.tr("settings.about.community.eyebrow")) {
                 VStack(alignment: .leading, spacing: 14) {
                     SettingsSectionHeader(
-                        title: "Contribute or report issues",
-                        subtitle: "Open an issue, review the code, or send a pull request in the public repository.",
-                        eyebrow: "Open Source"
+                        title: L10n.tr("settings.about.community.headerTitle"),
+                        subtitle: L10n.tr("settings.about.community.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.about.community.eyebrow")
                     )
 
                     HStack(spacing: 10) {
-                        Button("Open repository") {
+                        Button(L10n.tr("settings.about.community.openRepository")) {
                             openURL(URL(string: "https://github.com/cirrondly/cirrondly-desk-community")!)
                         }
 
-                        Button("Report issue") {
+                        Button(L10n.tr("settings.about.community.reportIssue")) {
                             openURL(URL(string: "https://github.com/cirrondly/cirrondly-desk-community/issues")!)
                         }
 
-                        Button("Join Slack") {
+                        Button(L10n.tr("settings.about.community.joinSlack")) {
                             openURL(URL(string: "https://join.slack.com/t/cirrondly/shared_invite/zt-3vvu6usdh-BCKprBTcOj0BiL~QAZNMBw")!)
                         }
                     }
 
                     Divider()
 
-                    Button("Need team analytics? See Cirrondly Desk at cirrondly.com/desk.") {
+                    Button(L10n.tr("settings.about.community.teamAnalytics")) {
                         openURL(URL(string: "https://cirrondly.com/desk")!)
                     }
                     .font(Typography.body(11, weight: .semibold))
@@ -99,7 +99,7 @@ struct AboutTab: View {
     private var versionString: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        return "Version \(short) (\(build))"
+        return L10n.tr("settings.about.version", short, build)
     }
 
     private func attributionLink(title: String, url: String) -> some View {

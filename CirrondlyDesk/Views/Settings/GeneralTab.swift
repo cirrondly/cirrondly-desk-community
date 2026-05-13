@@ -16,19 +16,19 @@ struct GeneralTab: View {
 
     var body: some View {
         SettingsPaneScroll {
-            SettingsSectionCard(title: "System", subtitle: "Choose how Cirrondly Desk runs day to day.", eyebrow: "General") {
+            SettingsSectionCard(title: L10n.tr("settings.general.system.cardTitle"), subtitle: L10n.tr("settings.general.system.cardSubtitle"), eyebrow: L10n.tr("settings.tab.general")) {
                 VStack(alignment: .leading, spacing: 16) {
                     SettingsSectionHeader(
-                        title: "System",
-                        subtitle: "Startup and background polling defaults for the menu bar app.",
-                        eyebrow: "General"
+                        title: L10n.tr("settings.general.system.headerTitle"),
+                        subtitle: L10n.tr("settings.general.system.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.tab.general")
                     )
 
                     SettingsSplitRow(
-                        title: "Launch at login",
-                        subtitle: "Automatically open Cirrondly Desk when your Mac session starts."
+                        title: L10n.tr("settings.general.launchAtLogin.title"),
+                        subtitle: L10n.tr("settings.general.launchAtLogin.subtitle")
                     ) {
-                        Toggle("Launch at login", isOn: Binding(
+                        Toggle(L10n.tr("settings.general.launchAtLogin.title"), isOn: Binding(
                             get: { container.launchAtLoginService.isEnabled },
                             set: { container.launchAtLoginService.setEnabled($0) }
                         ))
@@ -39,15 +39,15 @@ struct GeneralTab: View {
                     Divider()
 
                     SettingsSplitRow(
-                        title: "Refresh cadence",
-                        subtitle: "Controls how often enabled providers are checked in the background."
+                        title: L10n.tr("settings.general.refreshCadence.title"),
+                        subtitle: L10n.tr("settings.general.refreshCadence.subtitle")
                     ) {
-                        Picker("Refresh cadence", selection: $refreshInterval) {
-                            Text("30 seconds").tag(30.0)
-                            Text("1 minute").tag(60.0)
-                            Text("2 minutes").tag(120.0)
-                            Text("5 minutes").tag(300.0)
-                            Text("10 minutes").tag(600.0)
+                        Picker(L10n.tr("settings.general.refreshCadence.title"), selection: $refreshInterval) {
+                            Text(L10n.tr("settings.general.refreshCadence.30s")).tag(30.0)
+                            Text(L10n.tr("settings.general.refreshCadence.1m")).tag(60.0)
+                            Text(L10n.tr("settings.general.refreshCadence.2m")).tag(120.0)
+                            Text(L10n.tr("settings.general.refreshCadence.5m")).tag(300.0)
+                            Text(L10n.tr("settings.general.refreshCadence.10m")).tag(600.0)
                         }
                         .pickerStyle(.menu)
                         .labelsHidden()
@@ -56,12 +56,12 @@ struct GeneralTab: View {
                 }
             }
 
-            SettingsSectionCard(title: "Alerts", subtitle: "Pick when quota warnings should interrupt you.", eyebrow: "Notifications") {
+            SettingsSectionCard(title: L10n.tr("settings.general.alerts.cardTitle"), subtitle: L10n.tr("settings.general.alerts.cardSubtitle"), eyebrow: L10n.tr("settings.general.alerts.eyebrow")) {
                 VStack(alignment: .leading, spacing: 16) {
                     SettingsSectionHeader(
-                        title: "Quota alerts",
-                        subtitle: "Notification thresholds are evaluated against each provider's strongest usage window.",
-                        eyebrow: "Notifications"
+                        title: L10n.tr("settings.general.alerts.headerTitle"),
+                        subtitle: L10n.tr("settings.general.alerts.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.general.alerts.eyebrow")
                     )
 
                     HStack(spacing: 10) {
@@ -74,43 +74,43 @@ struct GeneralTab: View {
                     Divider()
 
                     SettingsSplitRow(
-                        title: "Service outages",
-                        subtitle: "Notify me when a tracked provider becomes degraded or goes into outage."
+                        title: L10n.tr("settings.general.serviceOutages.title"),
+                        subtitle: L10n.tr("settings.general.serviceOutages.subtitle")
                     ) {
-                        Toggle("Service outages", isOn: $notifyServiceStatus)
+                        Toggle(L10n.tr("settings.general.serviceOutages.title"), isOn: $notifyServiceStatus)
                             .labelsHidden()
                     }
 
                     Divider()
 
                     SettingsSplitRow(
-                        title: "Play sound",
-                        subtitle: "Attach the system notification sound when a provider crosses an enabled threshold."
+                        title: L10n.tr("settings.general.playSound.title"),
+                        subtitle: L10n.tr("settings.general.playSound.subtitle")
                     ) {
-                        Toggle("Play sound", isOn: $soundEnabled)
+                        Toggle(L10n.tr("settings.general.playSound.title"), isOn: $soundEnabled)
                             .labelsHidden()
                     }
 
                     Divider()
 
                     SettingsSplitRow(
-                        title: "Quiet hours",
-                        subtitle: "Pause notifications overnight while background tracking continues."
+                        title: L10n.tr("settings.general.quietHours.title"),
+                        subtitle: L10n.tr("settings.general.quietHours.subtitle")
                     ) {
-                        Toggle("Quiet hours", isOn: $quietEnabled)
+                        Toggle(L10n.tr("settings.general.quietHours.title"), isOn: $quietEnabled)
                             .labelsHidden()
                     }
 
                     if quietEnabled {
                         HStack(spacing: 12) {
-                            Picker("Starts", selection: $quietStart) {
+                            Picker(L10n.tr("settings.general.quietHours.starts"), selection: $quietStart) {
                                 ForEach(0..<24, id: \.self) { hour in
                                     Text(String(format: "%02d:00", hour)).tag(hour)
                                 }
                             }
                             .pickerStyle(.menu)
 
-                            Picker("Ends", selection: $quietEnd) {
+                            Picker(L10n.tr("settings.general.quietHours.ends"), selection: $quietEnd) {
                                 ForEach(0..<24, id: \.self) { hour in
                                     Text(String(format: "%02d:00", hour)).tag(hour)
                                 }

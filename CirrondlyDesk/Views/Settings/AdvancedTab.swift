@@ -6,30 +6,30 @@ struct AdvancedTab: View {
 
     var body: some View {
         SettingsPaneScroll {
-            SettingsSectionCard(title: "Integrations", subtitle: "Exports and local maintenance tools live here.", eyebrow: "Advanced") {
+            SettingsSectionCard(title: L10n.tr("settings.advanced.integrations.cardTitle"), subtitle: L10n.tr("settings.advanced.integrations.cardSubtitle"), eyebrow: L10n.tr("settings.tab.advanced")) {
                 VStack(alignment: .leading, spacing: 16) {
                     SettingsSectionHeader(
-                        title: "Integrations",
-                        subtitle: "These controls affect secondary integrations rather than local usage collection itself.",
-                        eyebrow: "Advanced"
+                        title: L10n.tr("settings.advanced.integrations.headerTitle"),
+                        subtitle: L10n.tr("settings.advanced.integrations.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.tab.advanced")
                     )
 
                     SettingsSplitRow(
-                        title: "Statusline export",
-                        subtitle: "Continuously write the latest usage snapshot to the shell-friendly statusline payload."
+                        title: L10n.tr("settings.advanced.statusline.title"),
+                        subtitle: L10n.tr("settings.advanced.statusline.subtitle")
                     ) {
-                        Toggle("Statusline export", isOn: $statuslineEnabled)
+                        Toggle(L10n.tr("settings.advanced.statusline.title"), isOn: $statuslineEnabled)
                             .labelsHidden()
                     }
                 }
             }
 
-            SettingsSectionCard(title: "Storage", subtitle: "Local state, credentials, and exported data stay on disk here.", eyebrow: "Data") {
+            SettingsSectionCard(title: L10n.tr("settings.advanced.storage.cardTitle"), subtitle: L10n.tr("settings.advanced.storage.cardSubtitle"), eyebrow: L10n.tr("settings.advanced.storage.eyebrow")) {
                 VStack(alignment: .leading, spacing: 14) {
                     SettingsSectionHeader(
-                        title: "Local storage",
-                        subtitle: "Use this folder if you need to inspect cached usage or reset the local app state.",
-                        eyebrow: "Data"
+                        title: L10n.tr("settings.advanced.storage.headerTitle"),
+                        subtitle: L10n.tr("settings.advanced.storage.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.advanced.storage.eyebrow")
                     )
 
                     Text(storagePath)
@@ -39,21 +39,21 @@ struct AdvancedTab: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.cirrondlyBlueLightest.opacity(0.9), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-                    Button("Open Folder") {
+                    Button(L10n.tr("settings.advanced.storage.openFolder")) {
                         NSWorkspace.shared.open(URL(fileURLWithPath: storagePath))
                     }
                 }
             }
 
-            SettingsSectionCard(title: "Reset", subtitle: "Use only when you want to clear local preferences and start over.", eyebrow: "Danger Zone") {
+            SettingsSectionCard(title: L10n.tr("settings.advanced.reset.cardTitle"), subtitle: L10n.tr("settings.advanced.reset.cardSubtitle"), eyebrow: L10n.tr("settings.advanced.reset.eyebrow")) {
                 VStack(alignment: .leading, spacing: 14) {
                     SettingsSectionHeader(
-                        title: "Reset local settings",
-                        subtitle: "This clears UserDefaults for the app. Provider credentials stored outside the app are not removed.",
-                        eyebrow: "Danger Zone"
+                        title: L10n.tr("settings.advanced.reset.headerTitle"),
+                        subtitle: L10n.tr("settings.advanced.reset.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.advanced.reset.eyebrow")
                     )
 
-                    Button("Reset local settings", role: .destructive) {
+                    Button(L10n.tr("settings.advanced.reset.button"), role: .destructive) {
                         if let bundle = Bundle.main.bundleIdentifier {
                             UserDefaults.standard.removePersistentDomain(forName: bundle)
                         }

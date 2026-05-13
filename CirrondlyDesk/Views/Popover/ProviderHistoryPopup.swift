@@ -155,29 +155,11 @@ struct ProviderHistoryPopup: View {
     }
 
     private var cycleUnitLabel: String {
-        switch window.unit {
-        case .tokens:
-            return "tokens"
-        case .requests:
-            return "requests"
-        case .credits:
-            return "credits"
-        case .dollars:
-            return "USD"
-        }
+        window.unit.localizedLabel
     }
 
     private var chartUnitLabel: String {
-        switch window.unit {
-        case .tokens:
-            return "Tokens"
-        case .requests:
-            return "Requests"
-        case .credits:
-            return "Credits"
-        case .dollars:
-            return "USD"
-        }
+        window.unit.localizedChartLabel
     }
 
     private var remainingAmount: Double {
@@ -277,7 +259,7 @@ private struct ForecastTextBlock: View {
                let timeToDepletion = forecast.timeToDepletion,
                let resetAt {
                 Label {
-                    Text("At this pace, you'll run out in \(formatDuration(timeToDepletion)), before the reset on \(formatDate(resetAt)). Consider slowing down or upgrading.")
+                    Text(L10n.tr("history.forecast.warning", formatDuration(timeToDepletion), formatDate(resetAt)))
                         .foregroundStyle(Color.cirrondlyCriticalRed)
                 } icon: {
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -303,40 +285,26 @@ private struct ForecastTextBlock: View {
 
     private var successMessage: String {
         if let resetAt, let limitAmount {
-            return "At current pace, you'll use ~\(Int(forecast.projectedPercentageAtReset.rounded()))% of this cycle. \(formatValue(remainingAmount)) \(cycleUnit) remaining, cycle resets \(formatDate(resetAt))."
+            return L10n.tr("history.forecast.success.remainingReset", "\(Int(forecast.projectedPercentageAtReset.rounded()))", formatValue(remainingAmount), cycleUnit, formatDate(resetAt))
         }
 
         if let resetAt {
-            return "At current pace, you'll use ~\(Int(forecast.projectedPercentageAtReset.rounded()))% of this cycle. Current usage is \(formatValue(usedAmount)) \(cycleUnit), cycle resets \(formatDate(resetAt))."
+            return L10n.tr("history.forecast.success.currentUsageReset", "\(Int(forecast.projectedPercentageAtReset.rounded()))", formatValue(usedAmount), cycleUnit, formatDate(resetAt))
         }
 
         if let limitAmount {
-            return "At current pace, you'll use ~\(Int(forecast.projectedPercentageAtReset.rounded()))% of this cycle. \(formatValue(remainingAmount)) \(cycleUnit) remaining from \(formatValue(limitAmount))."
+            return L10n.tr("history.forecast.success.remainingFrom", "\(Int(forecast.projectedPercentageAtReset.rounded()))", formatValue(remainingAmount), cycleUnit, formatValue(limitAmount))
         }
 
-        return "At current pace, you'll use ~\(Int(forecast.projectedPercentageAtReset.rounded()))% of this cycle."
+        return L10n.tr("history.forecast.success.generic", "\(Int(forecast.projectedPercentageAtReset.rounded()))")
     }
 
     private func formatDuration(_ seconds: TimeInterval) -> String {
-        let totalSeconds = max(0, Int(seconds.rounded()))
-        let days = totalSeconds / 86_400
-        let hours = (totalSeconds % 86_400) / 3_600
-        let minutes = (totalSeconds % 3_600) / 60
-
-        if days > 0 {
-            return "~\(days)d \(hours)h"
-        }
-        if hours > 0 {
-            return "~\(hours)h \(minutes)m"
-        }
-        return "~\(max(1, minutes))m"
+        TimeHelpers.compactDurationString(seconds: seconds, approximate: true)
     }
 
     private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = "d MMM yyyy 'at' h:mm a"
-        return formatter.string(from: date)
+        date.formatted(date: .abbreviated, time: .shortened)
     }
 
     private func formatValue(_ value: Double) -> String {
@@ -370,9 +338,9 @@ private struct NeutralForecastTextBlock: View {
 
     private var message: String {
         if let resetAt {
-            return "Projection will appear here once this provider reports enough cycle data. Current cycle resets \(TimeHelpers.absoluteResetString(at: resetAt) ?? "soon")."
+            return L10n.tr("history.forecast.neutral.withReset", TimeHelpers.absoluteResetString(at: resetAt) ?? L10n.tr("history.soon"))
         }
-        return "Projection will appear here once this provider reports enough cycle data."
+        return L10n.tr("history.forecast.neutral.generic")
     }
 }
 
@@ -381,36 +349,27 @@ private struct HistoryStatsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("This cycle so far")
+            Text(L10n.tr("history.section.cycleSoFar"))
                 .font(Typography.body(16, weight: .semibold))
                 .foregroundStyle(Color.cirrondlyBlack)
 
             VStack(alignment: .leading, spacing: 10) {
-                HistoryStatRow(title: "Used", value: "\(formatValue(window.used)) \(unitLabel)")
-                HistoryStatRow(title: "Remaining", value: remainingValue)
-                HistoryStatRow(title: "Reset", value: TimeHelpers.absoluteResetString(at: window.resetAt) ?? "Unavailable")
-                HistoryStatRow(title: "Time left", value: TimeHelpers.relativeResetString(until: window.resetAt) ?? "Unavailable")
+                HistoryStatRow(title: L10n.tr("history.stat.used"), value: "\(formatValue(window.used)) \(unitLabel)")
+                HistoryStatRow(title: L10n.tr("history.stat.remaining"), value: remainingValue)
+                HistoryStatRow(title: L10n.tr("history.stat.reset"), value: TimeHelpers.absoluteResetString(at: window.resetAt) ?? L10n.tr("common.unavailable"))
+                HistoryStatRow(title: L10n.tr("history.stat.timeLeft"), value: TimeHelpers.relativeResetString(until: window.resetAt) ?? L10n.tr("common.unavailable"))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var remainingValue: String {
-        guard let limit = window.limit else { return "Unavailable" }
+        guard let limit = window.limit else { return L10n.tr("common.unavailable") }
         return "\(formatValue(max(0, limit - window.used))) \(unitLabel)"
     }
 
     private var unitLabel: String {
-        switch window.unit {
-        case .tokens:
-            return "tokens"
-        case .requests:
-            return "requests"
-        case .credits:
-            return "credits"
-        case .dollars:
-            return "USD"
-        }
+        window.unit.localizedLabel
     }
 
     private func formatValue(_ value: Double) -> String {
@@ -478,7 +437,7 @@ extension ProviderResult {
         }
 
         return Window(
-            kind: .custom("History"),
+            kind: .custom(L10n.tr("provider.history")),
             used: dailyHeatmap.reduce(0) { partialResult, cell in
                 partialResult + cell.value
             },

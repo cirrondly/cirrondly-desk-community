@@ -20,7 +20,10 @@ final class NotificationService {
                     let resetKey = window.resetAt.map(TimeHelpers.iso8601Plain.string(from:)) ?? "none"
                     let key = "\(provider.identifier):\(window.kind.reportingKey):\(threshold):\(resetKey)"
                     guard deliveredKeys.insert(key).inserted else { continue }
-                    send(title: title(for: threshold, kind: window.kind), body: "\(provider.displayName) is at \(Int(window.percentage.rounded()))%.")
+                    send(
+                        title: title(for: threshold, kind: window.kind),
+                        body: L10n.tr("notification.threshold.body", provider.displayName, "\(Int(window.percentage.rounded()))")
+                    )
                 }
             }
         }
@@ -72,32 +75,32 @@ final class NotificationService {
     }
 
     private func title(for threshold: Int, kind: WindowKind) -> String {
-        let label = kind == .weekly ? "Weekly" : "Session"
+        let label = kind == .weekly ? L10n.tr("window.title.weekly") : L10n.tr("window.title.session")
         switch threshold {
         case 100:
-            return "\(label) limit reached"
+            return L10n.tr("notification.threshold.limitReached", label)
         default:
-            return "\(label) at \(threshold)%"
+            return L10n.tr("notification.threshold.at", label, "\(threshold)")
         }
     }
 
     private func serviceStatusTitle(for status: ProviderServiceStatus) -> String {
         switch status.health {
         case .outage:
-            return "\(status.serviceName) outage detected"
+            return L10n.tr("notification.service.outageTitle", status.serviceName)
         case .degraded:
-            return "\(status.serviceName) service degraded"
+            return L10n.tr("notification.service.degradedTitle", status.serviceName)
         case .checking, .operational, .unknown:
-            return "\(status.serviceName) service update"
+            return L10n.tr("notification.service.updateTitle", status.serviceName)
         }
     }
 
     private func serviceStatusBody(for status: ProviderServiceStatus) -> String {
         switch status.health {
         case .outage:
-            return "Heads up: \(status.serviceName) is not operational right now. \(status.message)"
+            return L10n.tr("notification.service.outageBody", status.serviceName, status.message)
         case .degraded:
-            return "Heads up: \(status.serviceName) is having problems right now. \(status.message)"
+            return L10n.tr("notification.service.degradedBody", status.serviceName, status.message)
         case .checking, .operational, .unknown:
             return status.message
         }

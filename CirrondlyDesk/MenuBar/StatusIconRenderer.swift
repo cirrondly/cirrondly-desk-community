@@ -12,13 +12,13 @@ enum MenuBarMode: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .minimal:
-            return "Minimal"
+            return L10n.tr("menuBar.mode.minimal")
         case .percentage:
-            return "Percentage"
+            return L10n.tr("menuBar.mode.percentage")
         case .burnRate:
-            return "Burn rate"
+            return L10n.tr("menuBar.mode.burnRate")
         case .providerPercentage:
-            return "Provider + %"
+            return L10n.tr("menuBar.mode.providerPercentage")
         }
     }
 }
@@ -78,10 +78,10 @@ enum StatusIconRenderer {
         guard let worstProvider = snapshot.summary.worstProvider,
               let provider = snapshot.providers.first(where: { $0.identifier == worstProvider }),
               let window = provider.primaryWindow else {
-            return "Cirrondly Desk"
+            return L10n.tr("app.name.short")
         }
 
-        return "Highest active usage: \(provider.displayName) \(window.kind.title) \(Int(window.percentage.rounded()))%"
+        return L10n.tr("menuBar.tooltip.highestUsage", provider.displayName, window.kind.title, "\(Int(window.percentage.rounded()))")
     }
 
     private static func statusColor(for snapshot: UsageSnapshot?) -> NSColor {

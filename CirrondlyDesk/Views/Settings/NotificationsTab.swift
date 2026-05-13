@@ -6,16 +6,16 @@ struct DisplayTab: View {
 
     var body: some View {
         SettingsPaneScroll {
-            SettingsSectionCard(title: "Menu Bar", subtitle: "Tune the signal you keep visible all day.", eyebrow: "Display") {
+            SettingsSectionCard(title: L10n.tr("settings.display.menuBar.cardTitle"), subtitle: L10n.tr("settings.display.menuBar.cardSubtitle"), eyebrow: L10n.tr("settings.tab.display")) {
                 VStack(alignment: .leading, spacing: 16) {
                     SettingsSectionHeader(
-                        title: "Menu bar presentation",
-                        subtitle: "Switch between a minimal icon, raw percentage, burn-rate hint, or provider plus percentage.",
-                        eyebrow: "Display"
+                        title: L10n.tr("settings.display.menuBar.headerTitle"),
+                        subtitle: L10n.tr("settings.display.menuBar.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.tab.display")
                     )
 
                     SettingsSplitRow(
-                        title: "Display mode",
+                        title: L10n.tr("settings.display.menuBar.displayMode"),
                         subtitle: currentModeDescription
                     ) {
                         Menu {
@@ -63,22 +63,22 @@ struct DisplayTab: View {
                 }
             }
 
-            SettingsSectionCard(title: "Appearance", subtitle: "Keep the preferences window consistent with the rest of your desktop.", eyebrow: "Theme") {
+            SettingsSectionCard(title: L10n.tr("settings.display.appearance.cardTitle"), subtitle: L10n.tr("settings.display.appearance.cardSubtitle"), eyebrow: L10n.tr("settings.display.appearance.eyebrow")) {
                 VStack(alignment: .leading, spacing: 16) {
                     SettingsSectionHeader(
-                        title: "Theme",
-                        subtitle: "The current build keeps the settings surface light and adapts the app theme selection for future appearance controls.",
-                        eyebrow: "Theme"
+                        title: L10n.tr("settings.display.appearance.headerTitle"),
+                        subtitle: L10n.tr("settings.display.appearance.headerSubtitle"),
+                        eyebrow: L10n.tr("settings.display.appearance.eyebrow")
                     )
 
-                    Picker("Theme", selection: $theme) {
-                        Text("Auto").tag("auto")
-                        Text("Light").tag("light")
-                        Text("Dark").tag("dark")
+                    Picker(L10n.tr("settings.display.appearance.headerTitle"), selection: $theme) {
+                        Text(L10n.tr("settings.display.theme.auto")).tag("auto")
+                        Text(L10n.tr("settings.display.theme.light")).tag("light")
+                        Text(L10n.tr("settings.display.theme.dark")).tag("dark")
                     }
                     .pickerStyle(.segmented)
 
-                    Text("Cirrondly's menu bar and settings visuals continue using the app's blue and mint palette regardless of the theme choice.")
+                    Text(L10n.tr("settings.display.appearance.body"))
                         .font(Typography.body(11))
                         .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.68))
                         .fixedSize(horizontal: false, vertical: true)
@@ -88,17 +88,17 @@ struct DisplayTab: View {
     }
 
     private var currentModeDescription: String {
-        guard let mode = MenuBarMode(rawValue: menuBarMode) else { return "Show the status item in the menu bar." }
+        guard let mode = MenuBarMode(rawValue: menuBarMode) else { return L10n.tr("settings.display.mode.unknown") }
 
         switch mode {
         case .minimal:
-            return "Shows only the icon and health dot."
+            return L10n.tr("settings.display.mode.minimal")
         case .percentage:
-            return "Shows the highest usage percentage across enabled providers."
+            return L10n.tr("settings.display.mode.percentage")
         case .burnRate:
-            return "Shows estimated time remaining when burn-rate data exists."
+            return L10n.tr("settings.display.mode.burnRate")
         case .providerPercentage:
-            return "Shows the leading provider icon with its current percentage."
+            return L10n.tr("settings.display.mode.providerPercentage")
         }
     }
 
@@ -117,7 +117,7 @@ struct DisplayTab: View {
                             .font(Typography.body(13, weight: .semibold))
                         Spacer(minLength: 8)
                         if isSelected {
-                            SettingsBadge(title: "Active", tint: .cirrondlyGreenAccent)
+                            SettingsBadge(title: L10n.tr("settings.profiles.button.active"), tint: .cirrondlyGreenAccent)
                         }
                     }
 
@@ -143,13 +143,13 @@ struct DisplayTab: View {
     private func modeSummary(_ mode: MenuBarMode) -> String {
         switch mode {
         case .minimal:
-            return "Quiet default for a low-noise menu bar."
+            return L10n.tr("settings.display.modeSummary.minimal")
         case .percentage:
-            return "Best when you want a plain quota readout at a glance."
+            return L10n.tr("settings.display.modeSummary.percentage")
         case .burnRate:
-            return "Useful when local history can estimate how fast a session is consuming budget."
+            return L10n.tr("settings.display.modeSummary.burnRate")
         case .providerPercentage:
-            return "Best when you want to see which provider icon is currently closest to its limit."
+            return L10n.tr("settings.display.modeSummary.providerPercentage")
         }
     }
 }

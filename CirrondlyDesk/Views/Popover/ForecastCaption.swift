@@ -5,7 +5,7 @@ struct ForecastCaption: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
-            Text("Forecast")
+            Text(L10n.tr("forecast.badge"))
                 .font(Typography.body(10, weight: .semibold))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -23,12 +23,12 @@ struct ForecastCaption: View {
     private var captionText: String {
         switch forecast.status {
         case .onTrack, .tight:
-            return "~\(Int(forecast.projectedPercentageAtReset.rounded()))% used by reset"
+            return L10n.tr("forecast.caption.usedByReset", "\(Int(forecast.projectedPercentageAtReset.rounded()))")
         case .willExceed:
             if let timeToDepletion = forecast.timeToDepletion {
-                return "Runs out in \(formatInterval(timeToDepletion)) at this pace"
+                return L10n.tr("forecast.caption.runsOut", formatInterval(timeToDepletion))
             }
-            return "~\(Int(forecast.projectedPercentageAtReset.rounded()))% used by reset"
+            return L10n.tr("forecast.caption.usedByReset", "\(Int(forecast.projectedPercentageAtReset.rounded()))")
         }
     }
 
@@ -44,13 +44,6 @@ struct ForecastCaption: View {
     }
 
     private func formatInterval(_ seconds: TimeInterval) -> String {
-        let totalSeconds = max(0, Int(seconds.rounded()))
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-
-        if hours > 0 {
-            return "\(hours)h \(minutes)m"
-        }
-        return "\(max(1, minutes))m"
+        TimeHelpers.compactDurationString(seconds: seconds, approximate: false)
     }
 }

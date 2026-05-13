@@ -5,7 +5,7 @@ struct DetectedProvidersView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Detected providers")
+            Text(L10n.tr("onboarding.detectedProviders.title"))
                 .font(Typography.body(18, weight: .semibold))
             ForEach(providers, id: \.self) { provider in
                 Label(provider, systemImage: "checkmark.circle.fill")

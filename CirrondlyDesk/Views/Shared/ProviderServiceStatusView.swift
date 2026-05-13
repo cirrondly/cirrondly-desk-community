@@ -87,13 +87,13 @@ struct ProviderServiceStatusView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if let checkedAt = status.checkedAt {
-                Text("Checked \(RelativeDateTimeFormatter().localizedString(for: checkedAt, relativeTo: Date()))")
+                Text(L10n.tr("service.status.checked", RelativeDateTimeFormatter().localizedString(for: checkedAt, relativeTo: Date())))
                     .font(Typography.body(10))
                     .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.58))
             }
 
             if let url = status.statusPageURL {
-                Button("Open status page") {
+                Button(L10n.tr("service.status.openStatusPage")) {
                     openURL(url)
                     isShowingAlert = false
                 }
@@ -188,13 +188,13 @@ struct ProviderServiceStatusPageButton: View {
                 Button {
                     openURL(url)
                 } label: {
-                    Label("Status page", systemImage: "arrow.up.right.square")
+                    Label(L10n.tr("service.status.page"), systemImage: "arrow.up.right.square")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .tint(tint)
             } else {
-                Label("No public status page", systemImage: "slash.circle")
+                Label(L10n.tr("service.status.noPublicStatusPage"), systemImage: "slash.circle")
                     .font(Typography.body(11, weight: .semibold))
                     .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.45))
                     .padding(.horizontal, 10)

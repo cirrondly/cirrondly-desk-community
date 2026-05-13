@@ -36,10 +36,10 @@ struct PopoverRootView: View {
                                 ProviderRowView(provider: provider)
                             }
                         } else if container.usageAggregator.isRefreshing {
-                            ProgressView("Refreshing providers…")
+                            ProgressView(L10n.tr("popover.loading.refreshingProviders"))
                                 .font(Typography.body(13))
                         } else {
-                            Text("No providers have reported usage yet. Enable sources in Settings to start tracking locally.")
+                            Text(L10n.tr("popover.empty.noProviders"))
                                 .font(Typography.body(13))
                                 .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.8))
                                 .padding(16)

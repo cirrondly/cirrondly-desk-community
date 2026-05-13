@@ -9,13 +9,13 @@ struct BurnRateIndicator: View {
                 .foregroundStyle(Color.cirrondlyWarningOrange)
 
             if let burnRate {
-                Text("$\(burnRate.costPerHour, format: .number.precision(.fractionLength(2)))/hr")
+                Text(L10n.tr("popover.burnRate.ratePerHour", burnRate.costPerHour.formatted(.currency(code: "USD").precision(.fractionLength(0...2)))))
                     .font(Typography.mono(12))
-                Text(burnRate.isSafeToStartHeavyTask ? "Safe to start heavy" : "Stay light")
+                Text(burnRate.isSafeToStartHeavyTask ? L10n.tr("popover.burnRate.safeHeavy") : L10n.tr("popover.burnRate.stayLight"))
                     .font(Typography.body(12, weight: .semibold))
                     .foregroundStyle(burnRate.isSafeToStartHeavyTask ? Color.cirrondlyGreenAccent : Color.cirrondlyWarningOrange)
             } else {
-                Text("Burn rate unavailable")
+                Text(L10n.tr("popover.burnRate.unavailable"))
                     .font(Typography.body(12))
                     .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.7))
             }

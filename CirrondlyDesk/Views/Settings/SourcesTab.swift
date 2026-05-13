@@ -35,15 +35,15 @@ struct ProvidersTab: View {
         GeometryReader { proxy in
             HStack(alignment: .top, spacing: 18) {
                 SettingsPaneScroll {
-                    SettingsSectionCard(title: "Providers", subtitle: "Enable the sources Cirrondly should track and inspect their current state.", eyebrow: "Sources") {
+                    SettingsSectionCard(title: L10n.tr("settings.sources.providers.cardTitle"), subtitle: L10n.tr("settings.sources.providers.cardSubtitle"), eyebrow: L10n.tr("settings.tab.sources")) {
                         VStack(alignment: .leading, spacing: 16) {
                             SettingsSectionHeader(
-                                title: "Providers",
-                                subtitle: "This list controls which sources appear in the app and which providers are polled in the background.",
-                                eyebrow: "Sources"
+                                title: L10n.tr("settings.sources.providers.headerTitle"),
+                                subtitle: L10n.tr("settings.sources.providers.headerSubtitle"),
+                                eyebrow: L10n.tr("settings.tab.sources")
                             )
 
-                            Button("Refresh all providers") {
+                            Button(L10n.tr("settings.sources.providers.refreshAll")) {
                                 Task { await container.pollingManager.forceRefresh() }
                             }
 
@@ -79,8 +79,8 @@ struct ProvidersTab: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     SettingsEmptyState(
-                        title: "No provider selected",
-                        subtitle: "Enable a source from the sidebar to inspect its current status and configuration.",
+                        title: L10n.tr("settings.sources.empty.title"),
+                        subtitle: L10n.tr("settings.sources.empty.subtitle"),
                         symbol: "square.grid.2x2"
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -176,14 +176,14 @@ private struct ProviderSidebarRow: View {
     }
 
     private var subtitle: String {
-        guard isEnabled else { return "Disabled in the app" }
+        guard isEnabled else { return L10n.tr("settings.sources.sidebar.disabledInApp") }
         if let warning = result?.warnings.first?.message, !warning.isEmpty {
             return warning
         }
         if let primary = result?.primaryWindow {
             return "\(primary.kind.title) · \(Int(primary.percentage.rounded()))%"
         }
-        return "Enabled and waiting for usage data"
+        return L10n.tr("settings.sources.sidebar.waitingForUsage")
     }
 }
 
@@ -197,7 +197,7 @@ private struct ProviderDetailPanel: View {
 
     var body: some View {
         SettingsPaneScroll {
-            SettingsSectionCard(title: provider.displayName, subtitle: provider.category.title, eyebrow: "Provider") {
+            SettingsSectionCard(title: provider.displayName, subtitle: provider.category.title, eyebrow: L10n.tr("settings.sources.provider.eyebrow")) {
                 VStack(alignment: .leading, spacing: 16) {
                     header
 
@@ -210,16 +210,16 @@ private struct ProviderDetailPanel: View {
             }
 
             if let result {
-                SettingsSectionCard(title: "Usage Windows", subtitle: "These cards reflect the latest provider snapshot available in the app.", eyebrow: "Metrics") {
+                SettingsSectionCard(title: L10n.tr("settings.sources.windows.cardTitle"), subtitle: L10n.tr("settings.sources.windows.cardSubtitle"), eyebrow: L10n.tr("settings.sources.windows.eyebrow")) {
                     VStack(alignment: .leading, spacing: 16) {
                         SettingsSectionHeader(
-                            title: "Usage windows",
-                            subtitle: "The menu bar and popover derive their most important status from these values.",
-                            eyebrow: "Metrics"
+                            title: L10n.tr("settings.sources.windows.headerTitle"),
+                            subtitle: L10n.tr("settings.sources.windows.headerSubtitle"),
+                            eyebrow: L10n.tr("settings.sources.windows.eyebrow")
                         )
 
                         if result.windows.isEmpty {
-                            Text("No quota windows were returned for this provider yet.")
+                            Text(L10n.tr("settings.sources.windows.empty"))
                                 .font(Typography.body(11))
                                 .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.68))
                         } else {
@@ -234,15 +234,15 @@ private struct ProviderDetailPanel: View {
             }
 
             if provider.identifier == "claude-code" {
-                SettingsSectionCard(title: "Manual Auth", subtitle: "Optional fallback for Claude's web session key.", eyebrow: "Claude") {
+                SettingsSectionCard(title: L10n.tr("settings.sources.claudeAuth.cardTitle"), subtitle: L10n.tr("settings.sources.claudeAuth.cardSubtitle"), eyebrow: L10n.tr("settings.sources.claudeAuth.eyebrow")) {
                     VStack(alignment: .leading, spacing: 14) {
                         SettingsSectionHeader(
-                            title: "Claude session key",
-                            subtitle: "Uses Claude.ai's internal API as a fallback. This may break if Anthropic changes its web auth flow.",
-                            eyebrow: "Claude"
+                            title: L10n.tr("settings.sources.claudeAuth.headerTitle"),
+                            subtitle: L10n.tr("settings.sources.claudeAuth.headerSubtitle"),
+                            eyebrow: L10n.tr("settings.sources.claudeAuth.eyebrow")
                         )
 
-                        SecureField("Claude sessionKey", text: $claudeSessionKey)
+                        SecureField(L10n.tr("settings.sources.claudeAuth.fieldPlaceholder"), text: $claudeSessionKey)
                             .textFieldStyle(.roundedBorder)
                     }
                 }
@@ -302,23 +302,23 @@ private struct ProviderDetailPanel: View {
 
     private var statusLine: String {
         if !isEnabled {
-            return "Disabled. This provider will not appear in the app or participate in background refresh."
+            return L10n.tr("settings.sources.statusLine.disabled")
         }
         if isRefreshing {
-            return "Refreshing provider data now."
+            return L10n.tr("settings.sources.statusLine.refreshing")
         }
         if let warning = result?.warnings.first?.message, !warning.isEmpty {
             return warning
         }
         if let result {
-            return "Tracking via \(sourceLabel(result.source)) with profile \(result.profile)."
+            return L10n.tr("settings.sources.statusLine.tracking", sourceLabel(result.source), result.profile)
         }
-        return "Enabled and waiting for the first successful refresh."
+        return L10n.tr("settings.sources.statusLine.waitingFirstRefresh")
     }
 
     private func warningsSection(_ warnings: [ProviderWarning]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Latest messages")
+            Text(L10n.tr("settings.sources.latestMessages"))
                 .font(Typography.body(13, weight: .semibold))
                 .foregroundStyle(Color.cirrondlyBlueDark)
 
@@ -347,11 +347,11 @@ private struct ProviderDetailPanel: View {
     private func sourceLabel(_ source: DataSource) -> String {
         switch source {
         case .local:
-            return "local data"
+            return L10n.tr("settings.sources.sourceLabel.localData")
         case .api:
-            return "provider APIs"
+            return L10n.tr("settings.sources.sourceLabel.providerAPIs")
         case .mixed:
-            return "mixed sources"
+            return L10n.tr("settings.sources.sourceLabel.mixedSources")
         }
     }
 }
@@ -364,10 +364,10 @@ private struct ProviderInfoGrid: View {
 
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 12)], spacing: 12) {
-            infoCard(title: "State", value: stateText)
-            infoCard(title: "Source", value: sourceText)
-            infoCard(title: "Profile", value: result?.profile ?? provider.activeProfile?.name ?? "Default")
-            infoCard(title: "Updated", value: updatedText)
+            infoCard(title: L10n.tr("settings.sources.info.state"), value: stateText)
+            infoCard(title: L10n.tr("settings.sources.info.source"), value: sourceText)
+            infoCard(title: L10n.tr("settings.sources.info.profile"), value: result?.profile ?? provider.activeProfile?.name ?? L10n.tr("settings.sources.defaultProfile"))
+            infoCard(title: L10n.tr("settings.sources.info.updated"), value: updatedText)
         }
     }
 
@@ -391,36 +391,36 @@ private struct ProviderInfoGrid: View {
     }
 
     private var stateText: String {
-        if !isEnabled { return "Disabled" }
-        if isRefreshing { return "Refreshing" }
+        if !isEnabled { return L10n.tr("settings.sources.state.disabled") }
+        if isRefreshing { return L10n.tr("settings.sources.state.refreshing") }
         if let warning = result?.warnings.first {
             switch warning.level {
             case .info:
-                return "Informational"
+                return L10n.tr("settings.sources.state.informational")
             case .warning:
-                return "Needs attention"
+                return L10n.tr("settings.sources.state.needsAttention")
             case .critical:
-                return "Critical"
+                return L10n.tr("settings.sources.state.critical")
             }
         }
-        if result != nil { return "Connected" }
-        return "Enabled"
+        if result != nil { return L10n.tr("settings.sources.state.connected") }
+        return L10n.tr("settings.sources.state.enabled")
     }
 
     private var sourceText: String {
-        guard let result else { return "Awaiting refresh" }
+        guard let result else { return L10n.tr("settings.sources.source.awaitingRefresh") }
         switch result.source {
         case .local:
-            return "Local"
+            return L10n.tr("settings.sources.source.local")
         case .api:
-            return "API"
+            return L10n.tr("settings.sources.source.api")
         case .mixed:
-            return "Mixed"
+            return L10n.tr("settings.sources.source.mixed")
         }
     }
 
     private var updatedText: String {
-        guard let result else { return "Not fetched yet" }
+        guard let result else { return L10n.tr("settings.sources.updated.notFetched") }
         return RelativeDateTimeFormatter().localizedString(for: result.freshness, relativeTo: Date())
     }
 }
@@ -455,7 +455,7 @@ private struct ProviderWindowCard: View {
                 .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.72))
 
             if let resetAt = window.resetAt {
-                Text("Resets \(RelativeDateTimeFormatter().localizedString(for: resetAt, relativeTo: Date()))")
+                Text(L10n.tr("progress.resets", RelativeDateTimeFormatter().localizedString(for: resetAt, relativeTo: Date())))
                     .font(Typography.body(10))
                     .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.58))
             }
@@ -477,16 +477,7 @@ private struct ProviderWindowCard: View {
     }
 
     private var unitText: String {
-        switch window.unit {
-        case .tokens:
-            return "tokens"
-        case .requests:
-            return "requests"
-        case .credits:
-            return "credits"
-        case .dollars:
-            return "USD"
-        }
+        window.unit.localizedLabel
     }
 
     private var progressColor: Color {

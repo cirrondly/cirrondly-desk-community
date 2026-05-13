@@ -12,13 +12,13 @@ struct ContributionHeatmap: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Recent activity")
+                Text(L10n.tr("popover.heatmap.recentActivity"))
                     .font(Typography.body(10, weight: .semibold))
                     .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.66))
 
                 Spacer()
 
-                Text(isPlaceholder ? "Waiting for local history" : "Last 13 weeks")
+                Text(isPlaceholder ? L10n.tr("popover.heatmap.waitingForLocalHistory") : L10n.tr("popover.heatmap.last13weeks"))
                     .font(Typography.body(10))
                     .foregroundStyle(Color.cirrondlyBlueDark.opacity(0.52))
             }

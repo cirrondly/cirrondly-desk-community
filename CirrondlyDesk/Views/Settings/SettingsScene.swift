@@ -21,22 +21,22 @@ struct SettingsScene: View {
 
             TabView(selection: $selection) {
                 GeneralTab()
-                    .tabItem { Label("General", systemImage: "gearshape") }
+                    .tabItem { Label(L10n.tr("settings.tab.general"), systemImage: "gearshape") }
                     .tag(SettingsPaneTab.general)
                 ProvidersTab()
-                    .tabItem { Label("Sources", systemImage: "square.grid.2x2") }
+                    .tabItem { Label(L10n.tr("settings.tab.sources"), systemImage: "square.grid.2x2") }
                     .tag(SettingsPaneTab.sources)
                 DisplayTab()
-                    .tabItem { Label("Display", systemImage: "eye") }
+                    .tabItem { Label(L10n.tr("settings.tab.display"), systemImage: "eye") }
                     .tag(SettingsPaneTab.display)
                 ProfilesTab()
-                    .tabItem { Label("Profiles", systemImage: "person.2") }
+                    .tabItem { Label(L10n.tr("settings.tab.profiles"), systemImage: "person.2") }
                     .tag(SettingsPaneTab.profiles)
                 AdvancedTab()
-                    .tabItem { Label("Advanced", systemImage: "slider.horizontal.3") }
+                    .tabItem { Label(L10n.tr("settings.tab.advanced"), systemImage: "slider.horizontal.3") }
                     .tag(SettingsPaneTab.advanced)
                 AboutTab()
-                    .tabItem { Label("About", systemImage: "info.circle") }
+                    .tabItem { Label(L10n.tr("settings.tab.about"), systemImage: "info.circle") }
                     .tag(SettingsPaneTab.about)
             }
             .frame(minWidth: 920, minHeight: 620)
@@ -67,9 +67,7 @@ private struct SettingsWindowConfigurator: NSViewRepresentable {
         guard let window = view.window else { return }
         window.identifier = settingsWindowIdentifier
         window.appearance = NSAppearance(named: .aqua)
-        if window.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            window.title = "Settings"
-        }
+        window.title = L10n.tr("settings.window.title")
     }
 }
 
